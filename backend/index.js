@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from "helmet";
 import connectDB from "./config/connection.js";
+import userRouter from "./route/user.route.js";
 
 dotenv.config();
 
@@ -30,6 +31,8 @@ const PORT = 8080 || process.env.PORT;
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
+
+app.use("/api/user", userRouter);
 
 //REALIZAR CONEXAO COM O CONNECTIONDB PARA POSTERIORMENTE APRESENTAR A PORTA DE USO COM O APP.LISTEN
 connectDB().then(() => {
