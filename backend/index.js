@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from "helmet";
+import connectDB from "./config/connection.js";
 
 dotenv.config();
 
@@ -30,6 +31,9 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+//REALIZAR CONEXAO COM O CONNECTIONDB PARA POSTERIORMENTE APRESENTAR A PORTA DE USO COM O APP.LISTEN
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });
