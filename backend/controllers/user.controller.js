@@ -2,8 +2,8 @@ import UserModel from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
 import sendEmail from "../config/sendEmail.js";
-import generateAccessToken from "../utils/generetedAccessToken.js";
-import generateRefreshToken from "../utils/generetedRefreshToken.js";
+import generatedAccessToken from "../utils/generetedAccessToken.js";
+import generatedRefreshToken from "../utils/generetedRefreshToken.js";
 
 export async function registerUserController(req, res) {
   try {
@@ -78,6 +78,7 @@ export async function verifyEmailController(req, res) {
       { _id: code },
       { verify_email: true }
     );
+
     return res.json({
       message: "Email verificado com sucesso" || error,
       error: true,
@@ -93,7 +94,16 @@ export async function verifyEmailController(req, res) {
 export async function loginController(req, res) {
   try {
     const { email, password } = req.body;
+
     const user = await UserModel.findOne({ email });
+
+    if (!email || !password) {
+      return res.status(400).json({
+        messagem: "Email e senha são obrigatórios",
+        error: true,
+        success: false,
+      });
+    }
 
     if (!user) {
       return res.status(400).json({
@@ -121,8 +131,8 @@ export async function loginController(req, res) {
       });
     }
 
-    const accessToken = await generateAccessToken(user._id);
-    const refreshToken = await generateRefreshToken(user._id);
+    const accessToken = await generatedAccessToken(user._id);
+    const refreshToken = await generatedRefreshToken(user._id);
 
     const cookieOptions = {
       httpOnly: true,
@@ -141,6 +151,35 @@ export async function loginController(req, res) {
         accessToken,
         refreshToken,
       },
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function logoutController(req, res) {
+  try {
+    const userId = req.userId;
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
+
+    const removeRefreshToken = await UserModel.findByIdAndUpdate(userId, {
+      refresh_token: "",
+    });
+
+    return res.json({
+      messagem: "Logout realizado com sucesso",
+      error: false,
+      success: true,
     });
   } catch (error) {
     return res
