@@ -1,10 +1,13 @@
 import UserModel from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
 import sendEmail from "../config/sendEmail.js";
 import generatedAccessToken from "../utils/generetedAccessToken.js";
 import generatedRefreshToken from "../utils/generetedRefreshToken.js";
 import uploadImageCloudinary from "../utils/uploadImageCloudinary.js";
+import generateOtp from "../utils/generateOtp.js";
+import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 
 export async function registerUserController(req, res) {
   try {
@@ -213,5 +216,240 @@ export async function uploadAvatar(req, res) {
     return res
       .status(500)
       .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function updateUserDetails(req, res) {
+  try {
+    const userId = req.userId;
+    const { name, email, mobile, password } = req.body;
+
+    let hashPassword = "";
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hashPassword = await bcrypt.hash(password, salt);
+    }
+
+    const updateUser = await UserModel.findByIdAndUpdate(
+      { _id: userId },
+      {
+        ...(name && { name: name }),
+        ...(email && { email: email }),
+        ...(mobile && { mobile: mobile }),
+        ...(password && { password: hashPassword }),
+      }
+    );
+
+    return res.json({
+      message: "Usuário atualizado com sucesso",
+      error: false,
+      success: true,
+      // data: updateUser,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function forgotPasswordController(req, res) {
+  try {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        messagem: "Usuário não encontrado",
+        error: true,
+        success: false,
+      });
+    }
+
+    const otp = generateOtp();
+    const expireTime = new Date() + 60 * 60 * 1000;
+
+    const update = await UserModel.findByIdAndUpdate(user._id, {
+      forgot_password_otp: otp,
+      forgot_password_expiry: new Date(expireTime).toISOString(),
+    });
+
+    await sendEmail({
+      sendTo: email,
+      subject: "Recuperação de senha",
+      html: forgotPasswordTemplate({ name: user.name, otp }),
+    });
+
+    return res.json({
+      message: "Código enviado com sucesso. Verifique seu email",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function verifyForgotPasswordOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        message: "Código OTP ou email não infomado(s)",
+        error: true,
+        success: false,
+      });
+    }
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Usuário não encontrado",
+        error: true,
+        success: false,
+      });
+    }
+
+    const currentTime = new Date().toISOString();
+
+    if (user.forgot_password_expiry < currentTime) {
+      return res.status(400).json({
+        message: "Código expirado",
+        error: true,
+        success: false,
+      });
+    }
+
+    if (otp !== user.forgot_password_otp) {
+      return res.status(400).json({
+        message: "Código inválido",
+        error: true,
+        success: false,
+      });
+    }
+
+    const updateUser = await UserModel.findByIdAndUpdate(user?._id, {
+      forgot_password_otp: "",
+      forgot_password_expiry: "",
+    });
+
+    return res.json({
+      message: "Código verificado com sucesso",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function resetPassword(req, res) {
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        message: "Campos obrigatórios não informados",
+        error: true,
+        success: false,
+      });
+    }
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Usuário não encontrado",
+        error: true,
+        success: false,
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: "Senhas não conferem",
+        error: true,
+        success: false,
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+
+    const updateUser = await UserModel.findByIdAndUpdate(user._id, {
+      password: hashPassword,
+    });
+
+    return res.json({
+      message: "Senha atualizada com sucesso",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function refreshTokenController(req, res) {
+  try {
+    const refreshToken =
+      req.cookies.refreshToken || req?.headers?.authorization?.split(" ")[1];
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        message: "Token inválido",
+        error: true,
+        success: false,
+      });
+    }
+
+    const verifyToken = await jwt.verify(
+      refreshToken,
+      process.env.SECRET_KEY_REFRESH_TOKEN
+    );
+
+    if (!verifyToken) {
+      return res.status(401).json({
+        message: "Token expirado",
+        error: true,
+        success: false,
+      });
+    }
+
+    const userId = verifyToken?._id;
+
+    const newAccessToken = await generatedAccessToken(userId);
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+
+    res.cookie("accessToken", newAccessToken, cookieOptions);
+
+    return res.json({
+      message: "Token atualizado com sucesso",
+      error: false,
+      success: true,
+      data: {
+        accessToken: newAccessToken,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 }
