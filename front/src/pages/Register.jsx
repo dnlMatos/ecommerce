@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa6";
@@ -6,11 +5,22 @@ import { Link } from "react-router-dom";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+  };
 
   return (
     <section className="w-full container mx-auto px-2">
       <div className="bg-white my-4 w-full max-w-lg mx-auto rounded p-7">
-        <p>Formulário de cadastro</p>
+        <h3 className="">Formulário de cadastro</h3>
         <form className="grid gap-4 mt-6">
           <div className="grid gap-1">
             <label htmlFor="name">Nome:</label>
@@ -20,8 +30,8 @@ const Register = () => {
               autoFocus
               className="bg-blue-50 p-2 border-2 border-gray-400 outline-none focus:border-gray-900 rounded"
               name="name"
-              value=""
-              onChange=""
+              value={data.name}
+              onChange={handleChange}
               placeholder="Digite seu nome"
             />
           </div>
@@ -33,8 +43,8 @@ const Register = () => {
               id="email"
               className="bg-blue-50 p-2 border-2 border-gray-400 outline-none focus:border-gray-900 rounded"
               name="email"
-              value=""
-              onChange=""
+              value={data.email}
+              onChange={handleChange}
               placeholder="Digite seu email"
             />
           </div>
@@ -47,8 +57,8 @@ const Register = () => {
                 id="password"
                 className="w-full outline-none"
                 name="password"
-                value=""
-                onChange=""
+                value={data.password}
+                onChange={handleChange}
                 placeholder="Digite sua senha"
               />
               <div
@@ -68,8 +78,8 @@ const Register = () => {
                 type=""
                 id="confirmPassword"
                 name="confirmPassword"
-                value=""
-                onChange=""
+                value={data.confirmPassword}
+                onChange={handleChange}
                 placeholder="Confirme sua senha"
                 className="w-full outline-none"
               />
@@ -79,11 +89,11 @@ const Register = () => {
               </div>
             </div>
           </div>
-          <button className="bg-green-800 hover:bg-green-700 p-2 rounded">
+          <button className="bg-green-800 hover:bg-green-700 p-2 rounded cursor-pointer text-white">
             Cadastrar
           </button>
         </form>
-        <p>
+        <p className="flex justify-between mt-4">
           Já é cadastrado?{" "}
           <Link
             to={"/login"}
