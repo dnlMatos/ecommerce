@@ -1,4 +1,3 @@
-import React from "react";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -13,7 +12,7 @@ const Login = () => {
             <input
               type="email"
               id="email"
-              className="bg-blue-50 p-2 border-2 border-gray-400 outline-none focus:border-gray-900 rounded"
+              className="bg-blue-50 p-2 border-2 border-gray-400 outline-none focus:border-primary-200 rounded"
               name="email"
               value=""
               onChange=""
@@ -23,7 +22,7 @@ const Login = () => {
 
           <div className="grid gap-1">
             <label htmlFor="password">Senha:</label>
-            <div className="bg-blue-50 p-2 border-2 border-gray-400 rounded flex items-center focus-within:border-gray-900">
+            <div className="bg-blue-50 p-2 border-2 border-gray-400 rounded flex items-center focus-within:border-primary-200">
               <input
                 type="password"
                 id="password"
@@ -43,7 +42,7 @@ const Login = () => {
               Esqueceu senha?
             </Link>
           </div>
-          <button className="bg-green-800 hover:bg-green-700 rounded p-2 cursor-pointer">
+          <button className="bg-green-800 hover:bg-green-700 rounded p-2 cursor-pointer text-white">
             Entrar
           </button>
         </form>

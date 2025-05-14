@@ -24,7 +24,7 @@ const Header = () => {
           <Link to="/" className="h-full flex items-center justify-center">
             <img
               src={logo}
-              width={100}
+              width={70}
               height={60}
               alt="logo"
               className="hidden lg:block"
