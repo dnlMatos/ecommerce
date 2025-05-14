@@ -1,5 +1,5 @@
-import UserModel from "../models/user.model.js";
 import bcrypt from "bcrypt";
+import UserModel from "../models/user.model.js";
 import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
 import sendEmail from "../config/sendEmail.js";
 import generatedAccessToken from "../utils/generetedAccessToken.js";
@@ -208,6 +208,41 @@ export async function uploadAvatar(req, res) {
         _id: userId,
         avatar: upload.url,
       },
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function updateUserDetails(req, res) {
+  try {
+    const userId = req.userId;
+    const { name, email, mobile, password } = req.body;
+
+    let hashPassword = "";
+
+    console.log(req.body);
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hashPassword = await bcrypt.hash(password, salt);
+    }
+
+    const updateUser = await UserModel.updateOne(
+      { _id: userId },
+      {
+        ...(name && { name: name }),
+        ...(email && { email: email }),
+        ...(mobile && { mobile: mobile }),
+        ...(password && { password: hashPassword }),
+      }
+    );
+    return res.json({
+      message: "Usuário atualizado com sucesso",
+      error: false,
+      success: true,
+      data: updateUser,
     });
   } catch (error) {
     return res
