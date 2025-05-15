@@ -2,7 +2,7 @@ import "./App.css";
 import { Footer } from "./components/Footer";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
-import Home from "./pages/Home";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -12,6 +12,7 @@ function App() {
         <Outlet />
       </main>
       <Footer />
+      <Toaster />
     </>
   );
 }
