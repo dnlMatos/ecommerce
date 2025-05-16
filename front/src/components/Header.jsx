@@ -74,7 +74,7 @@ const Header = () => {
                   {openUserMenu && (
                     <div className="absolute right-0 top-12">
                       <div className="bg--gradiente-to-r from-gray-400 via-gray-300 to-gray-200 rounded-lg shadow-lg p-4 w-48">
-                        <UserMenu />
+                        <UserMenu setOpenUserMenu={setOpenUserMenu} />
                       </div>
                     </div>
                   )}
