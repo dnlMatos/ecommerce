@@ -18,6 +18,7 @@ import upload from "../middleware/multer.js";
 const userRouter = Router();
 
 userRouter.post("/register", registerUserController);
+//ALTERAR O VERBO DA ROTA VERIFY-EMAIL PARA GET CASO A REQUISIÇÃO SEJA FEITA VIA FRONTEND
 userRouter.post("/verify-email", verifyEmailController);
 userRouter.post("/login", loginController);
 userRouter.get("/logout", auth, logoutController);
@@ -27,6 +28,6 @@ userRouter.put("/forgot-password", forgotPasswordController);
 userRouter.put("/verify-forgot-password-otp", verifyForgotPasswordOtp);
 userRouter.put("/reset-password", resetPassword);
 userRouter.post("/refresh-token", refreshToken);
-userRouter.get("/user-datails", auth, userDetails);
+userRouter.get("/user-details", auth, userDetails);
 
 export default userRouter;
