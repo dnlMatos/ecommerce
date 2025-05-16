@@ -5,6 +5,10 @@ import sendEmail from "../config/sendEmail.js";
 import generatedAccessToken from "../utils/generetedAccessToken.js";
 import generatedRefreshToken from "../utils/generetedRefreshToken.js";
 import uploadImageCloudinary from "../utils/uploadImageCloudinary.js";
+import generatedOTP from "../utils/generatedOTP.js";
+import jwt from "jsonwebtoken";
+import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
+import mongoose from "mongoose";
 
 export async function registerUserController(req, res) {
   try {
@@ -27,6 +31,7 @@ export async function registerUserController(req, res) {
         success: false,
       });
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
@@ -39,7 +44,7 @@ export async function registerUserController(req, res) {
     const newUser = new UserModel(payload);
     const save = await newUser.save();
 
-    const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code${save?._id}`;
+    const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code=${save?._id}`;
 
     const verifyEmail = await sendEmail({
       sendTo: email,
@@ -64,12 +69,22 @@ export async function registerUserController(req, res) {
 
 export async function verifyEmailController(req, res) {
   try {
-    const { code } = req.body;
-    const { user } = await UserModel.findOne({ _id: code });
+    const { code } = req.query;
+
+    // Validação 2: Verifica se o code existe e é um ObjectId válido
+    if (!code || !mongoose.Types.ObjectId.isValid(code)) {
+      return res.status(400).json({
+        message: "Código inválido ou ausente",
+        error: true,
+        success: false,
+      });
+    }
+
+    const user = await UserModel.findOne({ _id: code });
 
     if (!user) {
       return res.status(400).json({
-        message: "Cod inválido",
+        message: "Código inválido",
         error: true,
         success: false,
       });
@@ -81,9 +96,9 @@ export async function verifyEmailController(req, res) {
     );
 
     return res.json({
-      message: "Email verificado com sucesso" || error,
-      error: true,
-      success: false,
+      message: "Email verificado com sucesso",
+      error: false,
+      success: true,
     });
   } catch (error) {
     return res
@@ -243,6 +258,222 @@ export async function updateUserDetails(req, res) {
       error: false,
       success: true,
       data: updateUser,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function forgotPasswordController(req, res) {
+  try {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Usuário não encontrado",
+        error: true,
+        success: false,
+      });
+    }
+
+    const otp = generatedOTP();
+    const expireTime = new Date() + 60 * 60 * 1000;
+
+    const update = await UserModel.findByIdAndUpdate(user._id, {
+      forgot_password_otp: otp,
+      forgot_password_expiry: new Date(expireTime).toISOString(),
+    });
+
+    await sendEmail({
+      sendTo: email,
+      subject: "Recuperação de senha",
+      html: forgotPasswordTemplate({
+        name: user.name,
+        otp: otp,
+      }),
+    });
+
+    return res.json({
+      message: "Código enviado para o seu email",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function verifyForgotPasswordOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        message: "Todos os campos são obrigatórios",
+        error: true,
+        success: false,
+      });
+    }
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Usuário não encontrado",
+        error: true,
+        success: false,
+      });
+    }
+
+    const currentTime = new Date().toISOString();
+
+    if (user.forgot_password_expiry < currentTime) {
+      return res.status(400).json({
+        message: "Código expirado",
+        error: true,
+        success: false,
+      });
+    }
+
+    if (user.forgot_password_otp !== otp) {
+      return res.status(400).json({
+        message: "Código inválido",
+        error: true,
+        success: false,
+      });
+    }
+
+    const updateUser = await UserModel.findByIdAndUpdate(user?._id, {
+      forgot_password_otp: "",
+      forgot_password_expiry: "",
+    });
+
+    return res.json({
+      message: "Código válido",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function resetPassword(req, res) {
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        message: "Todos os campos são obrigatórios",
+        error: true,
+        success: false,
+      });
+    }
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Usuário não encontrado",
+        error: true,
+        success: false,
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: "As senhas não são iguais",
+        error: true,
+        success: false,
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+
+    const update = await UserModel.findOneAndUpdate(user._id, {
+      password: hashPassword,
+    });
+
+    return res.json({
+      message: "Senha atualizada com sucesso",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function refreshToken(req, res) {
+  try {
+    const refreshToken =
+      req.cookies.refreshToken || req?.headers?.authorization?.split(" ")[1];
+
+    if (!refreshToken)
+      return res
+        .status(401)
+        .json({ message: "Token inválido", error: true, success: false });
+
+    const verifyToken = jwt.verify(
+      refreshToken,
+      process.env.SECRET_KEY_REFRESH_SECRET
+    );
+
+    if (!verifyToken) {
+      return res.status(401).json({
+        message: "Token inválido",
+        error: true,
+        success: false,
+      });
+    }
+
+    const userId = verifyToken?.id;
+
+    const newAccessToken = await generatedAccessToken(userId);
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+    res.cookie("accessToken", newAccessToken, cookieOptions);
+
+    return res.json({
+      message: "Token atualizado com sucesso",
+      error: false,
+      success: true,
+      data: {
+        accessToken: newAccessToken,
+      },
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || error, error: true, success: false });
+  }
+}
+
+export async function userDetails(req, res) {
+  try {
+    const userId = req.userId;
+    const user = await UserModel.findById(userId);
+
+    return res.json({
+      message: "Usuário encontrado com sucesso",
+      error: false,
+      success: true,
+      data: user,
     });
   } catch (error) {
     return res
