@@ -3,11 +3,13 @@ import logo from "../assets/logo.jpg";
 import Search from "./Search";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaRegCircleUser } from "react-icons/fa6";
-import useMobile from "../hooks/useMobile";
+import { IoClose } from "react-icons/io5";
 import { BsCart4 } from "react-icons/bs";
+import { GiHamburgerMenu } from "react-icons/gi";
 import { useSelector } from "react-redux";
 import { GoTriangleUp, GoTriangleDown } from "react-icons/go";
 import UserMenu from "./UserMenu";
+import useMobile from "../hooks/useMobile";
 
 const Header = () => {
   const [isMobile] = useMobile();
@@ -16,6 +18,7 @@ const Header = () => {
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
   const isSearchPage = location.pathname === "/search";
+  const isUserMenu = location.pathname === "/user";
 
   const user = useSelector((state) => state?.user);
 
@@ -23,11 +26,24 @@ const Header = () => {
     navigate("/login");
   };
 
+  const handleCloseUserMenu = () => {
+    setOpenUserMenu(false);
+  };
+
+  const handleMobileUser = () => {
+    if (!user?._id) {
+      navigate("/login");
+      return;
+    } else {
+      navigate("/user");
+    }
+  };
+
   useEffect(() => {}, [openUserMenu]);
   return (
     <header className="h-24 lg:h-20 lg:shadow-md sticky top-0 z-40 flex flex-col justify-center gap-1 bg-white">
       {!(isSearchPage && isMobile) && (
-        <div className="container mx-auto flex items-center px-2 justify-between">
+        <div className="container mx-auto flex items-center justify-between">
           <div className="h-full">
             <Link to="/" className="h-full flex items-center justify-center">
               <img
@@ -52,8 +68,36 @@ const Header = () => {
           </div>
 
           <div>
-            <button className="text-neutral-600 lg:hidden">
-              <FaRegCircleUser size={26} />
+            <button
+              className="text-neutral-600 lg:hidden cursor-pointer"
+              onClick={() => {
+                if (isUserMenu) {
+                  window.history.back();
+                } else {
+                  handleMobileUser();
+                }
+              }}
+            >
+              <span className="relative block w-[26px] h-[26px]">
+                <GiHamburgerMenu
+                  size={26}
+                  className={`absolute left-0 top-0 transition-all duration-300 ease-in-out
+                    ${
+                      isUserMenu
+                        ? "opacity-0 scale-90 rotate-45"
+                        : "opacity-100 scale-100 rotate-0"
+                    }`}
+                />
+                <IoClose
+                  size={26}
+                  className={`absolute left-0 top-0 transition-all duration-300 ease-in-out
+                    ${
+                      isUserMenu
+                        ? "opacity-100 scale-100 rotate-0"
+                        : "opacity-0 scale-90 rotate-45"
+                    }`}
+                />
+              </span>
             </button>
 
             <div className="hidden lg:flex items-center gap-10">
@@ -73,8 +117,8 @@ const Header = () => {
 
                   {openUserMenu && (
                     <div className="absolute right-0 top-12">
-                      <div className="bg--gradiente-to-r from-gray-400 via-gray-300 to-gray-200 rounded-lg shadow-lg p-4 w-48">
-                        <UserMenu setOpenUserMenu={setOpenUserMenu} />
+                      <div className="bg--gradiente-to-r from-gray-400 via-gray-300 to-gray-200 rounded-lg shadow-lg p-2 w-52">
+                        <UserMenu close={handleCloseUserMenu} />
                       </div>
                     </div>
                   )}
@@ -82,7 +126,7 @@ const Header = () => {
               ) : (
                 <button
                   onClick={redirectToLoginPage}
-                  className="text-lg px-2 cursor-pointer"
+                  className="text-lg cursor-pointer px-2"
                 >
                   Entrar
                 </button>
@@ -101,7 +145,7 @@ const Header = () => {
         </div>
       )}
 
-      <div className="container mx-auto px-2 lg:hidden">
+      <div className="container mx-auto lg:hidden ">
         <Search />
       </div>
     </header>
