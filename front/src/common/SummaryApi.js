@@ -1,3 +1,5 @@
+// import { userDetails } from "../../../backend/controllers/user.controller";
+
 export const baseURL = "http://localhost:8080";
 
 export const SummaryApi = {
@@ -24,5 +26,20 @@ export const SummaryApi = {
   refreshToken: {
     url: `/api/user/refresh-token`,
     method: "POST",
+  },
+
+  userDetails: {
+    url: `/api/user/user-details`,
+    method: "GET",
+  },
+
+  resetPassword: {
+    url: `/api/user/reset-password`,
+    method: "PUT",
+  },
+
+  logout: {
+    url: `/api/user/logout`,
+    method: "GET",
   },
 };
