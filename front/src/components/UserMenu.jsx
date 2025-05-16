@@ -8,7 +8,7 @@ import AxiosToastError from "../utils/AxiosToastError";
 import toast from "react-hot-toast";
 import { logout } from "../store/userSlice";
 
-const UserMenu = () => {
+const UserMenu = ({ setOpenUserMenu }) => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
@@ -21,6 +21,7 @@ const UserMenu = () => {
         dispatch(logout());
         localStorage.clear();
         toast.success(response.data.message);
+        if (setOpenUserMenu) setOpenUserMenu(false);
       }
     } catch (error) {
       AxiosToastError(error);

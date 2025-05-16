@@ -6,6 +6,9 @@ import Axios from "../utils/Axios";
 import { SummaryApi } from "../common/SummaryApi";
 import AxiosToastError from "../utils/AxiosToastError";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import fetchUserDetails from "../utils/fetchUserDetails";
+import { setUserDetails } from "../store/userSlice";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -14,6 +17,7 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,6 +52,11 @@ const Login = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
+        // Buscar dados do usuário e atualizar Redux
+        const userData = await fetchUserDetails();
+        if (userData && userData.data) {
+          dispatch(setUserDetails(userData.data));
+        }
         setData({
           email: "",
           password: "",
