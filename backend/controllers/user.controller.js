@@ -69,6 +69,8 @@ export async function registerUserController(req, res) {
 
 export async function verifyEmailController(req, res) {
   try {
+    //ALTERNAR ENTRE QUERY SE O TESTE FOR VIA POSTMAN E BODY SER FOR PELO FRONTEND
+    //LEMBRAR DE ALTERAR O VERBO DA ROTA
     const { code } = req.query;
 
     // Validação 2: Verifica se o code existe e é um ObjectId válido
@@ -115,7 +117,7 @@ export async function loginController(req, res) {
 
     if (!email || !password) {
       return res.status(400).json({
-        messagem: "Email e senha são obrigatórios",
+        message: "Email e senha são obrigatórios",
         error: true,
         success: false,
       });
@@ -123,7 +125,7 @@ export async function loginController(req, res) {
 
     if (!user) {
       return res.status(400).json({
-        messagem: "Usuário inexistente",
+        message: "Usuário inexistente",
         error: true,
         success: false,
       });
@@ -131,7 +133,7 @@ export async function loginController(req, res) {
 
     if (user.status !== "Active") {
       return res.status(400).json({
-        messagem: "Contate seu administrador",
+        message: "Contate seu administrador",
         error: true,
         success: false,
       });
@@ -141,7 +143,7 @@ export async function loginController(req, res) {
 
     if (!checkPassword) {
       return res.status(400).json({
-        messagem: "Senha incorreta",
+        message: "Senha incorreta",
         error: true,
         success: false,
       });
@@ -149,6 +151,10 @@ export async function loginController(req, res) {
 
     const accessToken = await generatedAccessToken(user._id);
     const refreshToken = await generatedRefreshToken(user._id);
+
+    const updateUser = await UserModel.findByIdAndUpdate(user?._id, {
+      last_login_date: new Date(),
+    });
 
     const cookieOptions = {
       httpOnly: true,
@@ -160,7 +166,7 @@ export async function loginController(req, res) {
     res.cookie("refreshToken", refreshToken, cookieOptions);
 
     return res.json({
-      messagem: "Logado com sucesso",
+      message: "Logado com sucesso",
       error: false,
       success: true,
       data: {
@@ -193,7 +199,7 @@ export async function logoutController(req, res) {
     });
 
     return res.json({
-      messagem: "Logout realizado com sucesso",
+      message: "Logout realizado com sucesso",
       error: false,
       success: true,
     });
@@ -467,7 +473,9 @@ export async function refreshToken(req, res) {
 export async function userDetails(req, res) {
   try {
     const userId = req.userId;
-    const user = await UserModel.findById(userId);
+    const user = await UserModel.findById(userId).select(
+      "-password -refresh_token"
+    );
 
     return res.json({
       message: "Usuário encontrado com sucesso",
