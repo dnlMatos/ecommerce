@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 if (!process.env.RESEND_API) {
-  console.log("Chave do resendo ausente");
+  console.log("Chave do resend ausente");
 }
 
 const resend = new Resend(process.env.RESEND_API);
