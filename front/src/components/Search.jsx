@@ -75,9 +75,9 @@ const Search = () => {
               type="text"
               placeholder="Pesquisar por produtos e mais."
               autoFocus
-              //defaultValue={searchText}
+              defaultValue={searchText}
               className="bg-transparent w-full h-full outline-none"
-              //onChange={handleOnChange}
+              // onChange={handleOnChange}
             />
           </div>
         )}
