@@ -69,7 +69,7 @@ const Register = () => {
   return (
     <section className="w-full container mx-auto px-2">
       <div className="bg-white my-4 w-full max-w-lg mx-auto rounded p-7">
-        <h3 className="">Formulário de cadastro</h3>
+        <p className="font-semibold text-lg">Formulário de cadastro</p>
         <form className="grid gap-4 mt-6" onSubmit={handleSubmit}>
           <div className="grid gap-1">
             <label htmlFor="name">Nome:</label>

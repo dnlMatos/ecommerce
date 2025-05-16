@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { FaRegEyeSlash } from "react-icons/fa6";
+import { FaRegEye } from "react-icons/fa6";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
 import Axios from "../utils/Axios";
-import { SummaryApi } from "../common/SummaryApi";
-import AxiosToastError from "../utils/AxiosToastError";
+import { SummaryApi } from "../common/SummaryApi.js";
+import AxiosToastError from "../utils/AxiosToastError.js";
+import { Link, useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [data, setData] = useState({
@@ -13,23 +15,21 @@ const ForgotPassword = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData({
-      ...data,
-      [name]: value,
+
+    setData((preve) => {
+      return {
+        ...preve,
+        [name]: value,
+      };
     });
   };
 
-  const valideValue = Object.values(data).every((value) => value);
+  const valideValue = Object.values(data).every((el) => el);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      if (!valideValue) {
-        toast.error("Preencha todos os campos");
-        return;
-      }
-
       const response = await Axios({
         ...SummaryApi.forgotPassword,
         data: data,
@@ -41,10 +41,12 @@ const ForgotPassword = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
+        navigate("/verification-otp", {
+          state: data,
+        });
         setData({
           email: "",
         });
-        navigate("/verification-otp");
       }
     } catch (error) {
       AxiosToastError(error);
@@ -54,35 +56,36 @@ const ForgotPassword = () => {
   return (
     <section className="w-full container mx-auto px-2">
       <div className="bg-white my-4 w-full max-w-lg mx-auto rounded p-7">
-        <p className="font-bold text-lg">Recuperar senha</p>
+        <p className="font-semibold text-lg">Esqueceu sua senha </p>
         <form className="grid gap-4 py-4" onSubmit={handleSubmit}>
           <div className="grid gap-1">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Email :</label>
             <input
               type="email"
-              name="email"
               id="email"
-              placeholder="Digite seu email"
-              className="bg-blue-50 p-2 border rounded outline-none focus:border-primary-200"
+              className="bg-blue-50 p-2 border-2 rounded outline-none focus:border-primary-200"
+              name="email"
               value={data.email}
               onChange={handleChange}
+              placeholder="Digite seu email"
             />
           </div>
 
           <button
+            type="submit"
             disabled={!valideValue}
-            className={`${
+            className={` ${
               valideValue ? "bg-green-800 hover:bg-green-700" : "bg-gray-500"
-            }text-white py-2 rounded font-semibold my-3 tracking-wide`}
+            }    text-white py-2 rounded font-semibold my-3 tracking-wide cursor-pointer`}
           >
             Enviar OTP
           </button>
         </form>
 
         <p className="flex justify-between">
-          Já tem uma conta?{" "}
+          Já é cadastrado?{" "}
           <Link
-            to="/login"
+            to={"/login"}
             className="font-semibold text-green-700 hover:text-green-800"
           >
             Entrar

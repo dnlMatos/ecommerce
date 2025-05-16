@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { TypeAnimation } from "react-type-animation";
+import { FaArrowLeft } from "react-icons/fa";
 import useMobile from "../hooks/useMobile";
-import { FaArrowLeft } from "react-icons/fa6";
 
 const Search = () => {
   const navigate = useNavigate();
@@ -13,35 +13,31 @@ const Search = () => {
   const params = useLocation();
   const searchText = params.search.slice(3);
 
-  const redirectToSearchPage = () => {
-    navigate("/search");
-  };
-
   useEffect(() => {
     const isSearch = location.pathname === "/search";
     setIsSearchPage(isSearch);
   }, [location]);
 
+  const redirectToSearchPage = () => {
+    navigate("/search");
+  };
+
   return (
-    <div className="w-full min-w-[300px] lg:min-w-[420px] h-11 lg:h-12 rounded-lg border overflow-hidden flex items-center text-neutral-500 bg-slate-50 group focus-within:border-primary-200">
+    <div className="w-full  min-w-[300px] lg:min-w-[420px] h-11 lg:h-12 rounded-lg border overflow-hidden flex items-center text-neutral-500 bg-slate-50 group focus-within:border-primary-200 ">
       <div>
         {isMobile && isSearchPage ? (
           <Link
             to={"/"}
-            className="flex justify-center items-center h-full p-2 m-1 group-focus-within:text-blue-200 bg-white rounded-full shadow-md hover:bg-gray-300 group transition-colors duration-300"
+            className="flex justify-center items-center h-full p-2 m-1 group-focus-within:text-primary-200 bg-white rounded-full shadow-md"
           >
-            <FaArrowLeft
-              size={20}
-              className="text-gray-300 group-hover:text-gray-700 transition-colors duration-300"
-            />
+            <FaArrowLeft size={20} />
           </Link>
         ) : (
-          <button className="flex justify-center items-center h-full p-3 group-focus-within:text-blue-200">
+          <button className="flex justify-center items-center h-full p-3 group-focus-within:text-primary-200">
             <IoSearch size={22} />
           </button>
         )}
       </div>
-
       <div className="w-full h-full">
         {!isSearchPage ? (
           <div
@@ -52,26 +48,21 @@ const Search = () => {
               sequence={[
                 'Pesquisar "Leite"',
                 1000,
-                'Pesquisar "Café"',
+                'Pesquisar "Pao"',
                 1000,
-                'Pesquisar "Pão"',
+                'Pesquisar "Acucar"',
                 1000,
-                'Pesquisar "Cerveja"',
+                'Pesquisar "Panela"',
                 1000,
-                'Pesquisar "Carne"',
+                'Pesquisar "Chocolates"',
                 1000,
-                'Pesquisar "Frango"',
+                'Pesquisar "Doces"',
                 1000,
-                'Pesquisar "Peixe"',
+                'Pesquisar "Arroz"',
                 1000,
-                'Pesquisar "Suco"',
+                'Pesquisar "ovos"',
                 1000,
-                'Pesquisar "Refrigerante"',
-                1000,
-                'Pesquisar "Chocolate"',
-                1000,
-                'Pesquisar "Biscoito"',
-                1000,
+                'Pesquisar "Batatas"',
               ]}
               wrapper="span"
               speed={50}
@@ -82,9 +73,11 @@ const Search = () => {
           <div className="w-full h-full">
             <input
               type="text"
-              placeholder="Pesquise por produto"
+              placeholder="Pesquisar por produtos e mais."
               autoFocus
+              //defaultValue={searchText}
               className="bg-transparent w-full h-full outline-none"
+              //onChange={handleOnChange}
             />
           </div>
         )}
