@@ -42,4 +42,9 @@ export const SummaryApi = {
     url: `/api/user/logout`,
     method: "GET",
   },
+
+  uploadAvatar: {
+    url: `/api/user/upload-avatar`,
+    method: "PUT",
+  },
 };
