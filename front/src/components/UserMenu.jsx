@@ -1,4 +1,3 @@
-import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Divider from "./Divider";
@@ -13,19 +12,6 @@ const UserMenu = ({ close }) => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        if (close) close();
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [close]);
 
   const handleLogout = async () => {
     try {
@@ -46,20 +32,25 @@ const UserMenu = ({ close }) => {
     }
   };
 
+  const handleClose = () => {
+    if (close) {
+      close();
+    }
+  };
+
   return (
-    <div
-      ref={menuRef}
-      className={`bg-white shadow-lg rounded-lg p-4`}
-      style={{ zIndex: 9999 }}
-    >
+    <div>
       <div className="font-semibold">
         Minha conta
         <div className="text-sm items-center gap-2">
           <span className="max-w-52 text-ellipsis line-clamp-1">
             {user.name || user.mobile}
           </span>
-
-          <Link className="hover:text-green-500" to={"/dashboard/profile"}>
+          <Link
+            onClick={handleClose}
+            className="hover:text-green-600"
+            to={"/dashboard/profile"}
+          >
             <HiExternalLink size={20} />
           </Link>
         </div>
@@ -68,20 +59,22 @@ const UserMenu = ({ close }) => {
       <Divider />
       <div className="text-sm grid gap-2">
         <Link
+          onClick={handleClose}
           to={"/dashboard/myorders"}
-          className="cursor-pointer hover:bg-gradient-to-r from-[#363634] via-[#656563] to-[#363634] text-center hover:text-white rounded-lg py-2 px-2"
+          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
         >
           Meus Pedidos
         </Link>
         <Link
+          onClick={handleClose}
           to={"/dashboard/address"}
-          className="cursor-pointer hover:bg-gradient-to-r from-[#363634] via-[#656563] to-[#363634] text-center hover:text-white rounded-lg py-2 px-2"
+          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
         >
           Meu endereço
         </Link>
         <button
           onClick={handleLogout}
-          className="cursor-pointer hover:bg-gradient-to-r from-[#363634] via-[#656563] to-[#363634] text-center hover:text-white rounded-lg py-2 px-2"
+          className="text-semibold bg-gradient-to-r from-orange-320 via-orange-600 text-center text-white text-lg rounded-lg py-2 px-2"
         >
           Sair
         </button>

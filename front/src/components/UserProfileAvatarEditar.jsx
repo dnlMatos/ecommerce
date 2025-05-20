@@ -10,7 +10,7 @@ import AxiosToastError from "../utils/AxiosToastError.js";
 const UserProfileAvatarEditar = ({ close }) => {
   const user = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
-  const dispach = useDispatch();
+  const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,7 +30,7 @@ const UserProfileAvatarEditar = ({ close }) => {
         data: formData,
       });
       const { data: responseData } = response;
-      dispach(updatedAvatar(responseData.data.avatar));
+      dispatch(updatedAvatar(responseData.data.avatar));
     } catch (error) {
       AxiosToastError(error);
     } finally {

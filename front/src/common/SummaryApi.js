@@ -47,4 +47,9 @@ export const SummaryApi = {
     url: `/api/user/upload-avatar`,
     method: "PUT",
   },
+
+  uploadProfile: {
+    url: `/api/user/upload-user`,
+    method: "PUT",
+  },
 };
