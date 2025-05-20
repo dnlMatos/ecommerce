@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { userSelector } from "react-redux";
 import { FaRegUserCircle } from "react-icons/fa";
 import UserProfileAvatarEditar from "../components/UserProfileAvatarEditar";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const user = userSelector((state) => state.user);
+  const user = useSelector((state) => state.user);
   const [openProfileAvatarEdit, setOpenProfileAvatarEdit] = useState(false);
   const [openProfileEdit, setOpenProfileEdit] = useState(false);
   const [userData, setUserData] = useState({

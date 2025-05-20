@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { updatedAvatar } from "../store/userSlice";
-import { AxiosToastError } from "../utils/AxiosToastError";
-import { SumaryApi } from "../utils/SumaryApi";
 import Axios from "../utils/Axios";
 import { IoClose } from "react-icons/io5";
+import { SummaryApi } from "../common/SummaryApi";
+import AxiosToastError from "../utils/AxiosToastError.js";
 
 const UserProfileAvatarEditar = ({ close }) => {
   const user = useSelector((state) => state.user);
@@ -26,7 +26,7 @@ const UserProfileAvatarEditar = ({ close }) => {
     try {
       setLoading(true);
       const response = await Axios({
-        ...SumaryApi.uploadAvatar,
+        ...SummaryApi.uploadAvatar,
         data: formData,
       });
       const { data: responseData } = response;
