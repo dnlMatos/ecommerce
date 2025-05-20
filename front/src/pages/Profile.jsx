@@ -6,7 +6,21 @@ import UserProfileAvatarEditar from "../components/UserProfileAvatarEditar";
 const Profile = () => {
   const user = userSelector((state) => state.user);
   const [openProfileAvatarEdit, setOpenProfileAvatarEdit] = useState(false);
-  const [openProfileEdit, setOpenProfileEdit] = React.useState(false);
+  const [openProfileEdit, setOpenProfileEdit] = useState(false);
+  const [userData, setUserData] = useState({
+    name: user.name,
+    email: user.email,
+    mobile: user.mobile,
+  });
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setUserData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
     <div>
       <div className="w-20 h-20 bg-green-200 flex items-center justify-center rounded-full overflow-hidden drop-shadow-sm">
@@ -27,6 +41,44 @@ const Profile = () => {
           close={() => setOpenProfileAvatarEdit(false)}
         />
       )}
+      <form action="" className="my-4">
+        <div className="grid">
+          <label htmlFor="">Nome</label>
+          <input
+            type="text"
+            id="name"
+            placeholder={"Digite seu nome"}
+            className="py-2 bg-gray-200 outline-none border focus-with:border-red-800 rounded hover:border-red-600"
+            value={userData.name}
+            name="name"
+            onChange={handleOnChange}
+          />
+        </div>
+        <div className="grid">
+          <label htmlFor="mobile">Email</label>
+          <input
+            type="text"
+            id="email"
+            placeholder={"Digite seu email"}
+            className="py-2 bg-gray-200 outline-none border focus-with:border-red-800 rounded hover:border-red-600"
+            value={userData.email}
+            name="email"
+            onChange={handleOnChange}
+          />
+        </div>
+        <div className="grid">
+          <label htmlFor="mobile">Telefone</label>
+          <input
+            type="text"
+            id="mobile"
+            placeholder={"Digite seu nome"}
+            className="py-2 bg-gray-200 outline-none border focus-with:border-red-800 rounded hover:border-red-600"
+            value={userData.mobile}
+            name="mobile"
+            onChange={handleOnChange}
+          />
+        </div>
+      </form>
     </div>
   );
 };
