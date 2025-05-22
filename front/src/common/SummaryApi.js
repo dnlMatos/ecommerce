@@ -52,4 +52,9 @@ export const SummaryApi = {
     url: `/api/user/upload-user`,
     method: "PUT",
   },
+
+  updateUserDetails: {
+    url: `/api/user/update-user`,
+    method: "PUT",
+  },
 };

@@ -13,7 +13,6 @@ import fetchUserDetails from "../utils/fetchUserDetails";
 const Profile = () => {
   const user = useSelector((state) => state.user);
   const [openProfileAvatarEdit, setOpenProfileAvatarEdit] = useState(false);
-  const [openProfileEdit, setOpenProfileEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const [userData, setUserData] = useState({
@@ -35,7 +34,7 @@ const Profile = () => {
     try {
       setLoading(true);
       const response = await Axios({
-        ...SummaryApi.updateProfile,
+        ...SummaryApi.updateUserDetails,
         data: userData,
       });
       const { data: responseData } = response;
@@ -75,12 +74,12 @@ const Profile = () => {
       >
         Editar
       </button>
-      {openProfileEdit && (
+      {openProfileAvatarEdit && (
         <UserProfileAvatarEditar
           close={() => setOpenProfileAvatarEdit(false)}
         />
       )}
-      <form action="" className="my-4 grid gap-4" onSubmit={handleSubmit}>
+      <form className="my-4 grid gap-4" onSubmit={handleSubmit}>
         <div className="grid">
           <label htmlFor="">Nome</label>
           <input

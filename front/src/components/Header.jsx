@@ -67,6 +67,7 @@ const Header = () => {
             <Search />
           </div>
 
+          {/* MENU HAMBURGUER */}
           <div>
             <button
               className="text-neutral-600 lg:hidden cursor-pointer"
@@ -117,7 +118,7 @@ const Header = () => {
 
                   {openUserMenu && (
                     <div className="absolute right-0 top-12">
-                      <div className="bg--gradiente-to-r from-gray-400 via-gray-300 to-gray-200 rounded-lg shadow-lg p-2 w-52">
+                      <div className="bg-gradiente-to-r from-gray-400 via-gray-300 to-gray-200 rounded-lg shadow-lg p-2 w-52">
                         <UserMenu close={handleCloseUserMenu} />
                       </div>
                     </div>
