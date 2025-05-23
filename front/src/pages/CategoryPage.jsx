@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
+import UploadCategoryModel from "../components/UploadCategoryModel";
 
 const CategoryPage = () => {
+  const [openUploadCategory, setOpenUploadCategory] = useState(false);
+
   return (
     <section>
-      <div className="p-2 bg-white shadow-md flex items-center justify-center">
-        <h2 className="font-semibold">Categoria</h2>
-        <button className="text-sm font-bold text-white min-w-20 border border-red-600 hover:border-green-600 hover:bg-yellow-600 px-3 py-1 rounded-full mt-3 bg-gradient-to-r from-red-600 via-orange-500 to-yellow">
+      <div className="p-2 bg-white shadow-md flex items-center justify-between rounded">
+        <h2 className="font-semibold">Categoriaaa</h2>
+        <button
+          onClick={() => setOpenUploadCategory(true)}
+          className="text-sm font-bold text-white min-w-20 border border-red-600 hover:border-green-600 hover:bg-yellow-600 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 via-orange-500 to-yellow cursor-pointer"
+        >
           Adicionar Categoria
         </button>
       </div>
-      <div className="p-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
         <div className="w-32 h-56 rounded shadow-md">
           <img className="w-full object-scale-down" />
           <div className="items-center h-9 flex gap-2">
@@ -22,6 +28,9 @@ const CategoryPage = () => {
           </div>
         </div>
       </div>
+      {openUploadCategory && (
+        <UploadCategoryModel close={() => setOpenUploadCategory(false)} />
+      )}
     </section>
   );
 };
