@@ -60,6 +60,34 @@ const UserMenu = ({ close }) => {
       <div className="text-sm grid gap-2">
         <Link
           onClick={handleClose}
+          to={"/dashboard/category"}
+          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+        >
+          Categoria
+        </Link>
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/subcategory"}
+          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+        >
+          Sub-categoria
+        </Link>
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/upload-product"}
+          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+        >
+          Carregar produto
+        </Link>
+        <Link
+          onClick={handleClose}
+          to={"/dashboard/product"}
+          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+        >
+          Produto
+        </Link>
+        <Link
+          onClick={handleClose}
           to={"/dashboard/myorders"}
           className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
         >

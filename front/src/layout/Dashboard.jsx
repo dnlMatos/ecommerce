@@ -10,7 +10,7 @@ const Dashboard = () => {
           <UserMenu />
         </div>
         <div
-          className="bg-gray-100 p-4 border-l-2"
+          className="bg-gray-100 p-4 border-l-2 min-h-[85vh]"
           style={{
             borderImage: "linear-gradient(to bottom, #f84900, #f4a300) 1",
           }}
