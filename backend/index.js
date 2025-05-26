@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", userRouter);
 app.use("/api/category", categoryRouter);
-app.use("api/file", uploadRouter);
+app.use("/api/file", uploadRouter);
 
 //REALIZAR CONEXAO COM O CONNECTIONDB PARA POSTERIORMENTE APRESENTAR A PORTA DE USO COM O APP.LISTEN
 connectDB().then(() => {

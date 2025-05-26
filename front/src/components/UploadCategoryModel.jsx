@@ -10,14 +10,14 @@ const UploadCategoryModel = ({ close, fetchData }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     name: "",
-    image: " ",
+    image: "", // Corrigido: valor inicial string vazia
   });
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setData((prev) => {
       return {
-        prev,
+        ...prev,
         [name]: value,
       };
     });
@@ -44,38 +44,44 @@ const UploadCategoryModel = ({ close, fetchData }) => {
 
   const handleUploadCategoryImage = async (e) => {
     const file = e.target.files[0];
-
-    if (file) {
-      return;
+    if (!file) return;
+    try {
+      const response = await uploadImage(file);
+      if (
+        response &&
+        response.data &&
+        response.data.data &&
+        response.data.data.url
+      ) {
+        setData((prev) => ({
+          ...prev,
+          image: response.data.data.url,
+        }));
+      } else {
+        toast.error("Erro ao fazer upload da imagem.");
+      }
+    } catch (error) {
+      toast.error("Erro ao fazer upload da imagem.", error);
     }
-    const response = await uploadImage(file);
-    const { data: ImageResponse } = response;
-
-    setData((prev) => {
-      return {
-        ...prev,
-        image: ImageResponse.data.url,
-      };
-    });
   };
 
   return (
     <section className="top-0 left-0 right-0 p-4 bg-neutral-800 bg-opacity-60 flex items-center">
-      <div className="bg-white mas-w-41 w-full p-4 rounded">
+      <div className="bg-white w-full p-4 rounded">
         <div className="flex items-center justify-between">
           <h1 className="font-semibold">Categoria</h1>
           <button onClick={close} className="w-fit block ml-auto">
             <IoClose size={25} />
           </button>
         </div>
-        <form action="" className="my-3 grid gap-2" onClick={handleSubmit}>
+        <form action="" className="my-3 grid gap-2" onSubmit={handleSubmit}>
           <div className="grid gap-1">
             <label id="categoryName">Nome</label>
             <input
               type="text"
               name="name"
               id="categoryName"
-              className="bg-blue-50 p-2 border outline-blue-100 focus-within:border-primary-200 outline-none"
+              className="bg-blue-50 p-2 border outline-blue-100 focus-within:border-primary-200 outline-none rounded"
               placeholder="Nome da categoria"
               value={data.name}
               onChange={handleOnChange}
@@ -96,17 +102,22 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                 )}
               </div>
               <label htmlFor="uploadCategoryImage">
-                <div
-                  className={`${
+                <button
+                  type="button"
+                  disabled={!data.name}
+                  className={`min-w-20 ${
                     !data.name
-                      ? "text-sm font-bold text-white min-w-20 border border-red-600 hover:border-green-600 hover:bg-yellow-600 px3 py1 rounded-full mt-3 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-600 hover:bg-gradient-to-r hover:from-yellow-600 hover:via-orange-500 hover:to-red-600"
-                      : "bg-gradient-to-r from bg-green-500 to-yellow-500 rounded-full"
-                  }px-4 py-2 rounded cursor-pointer border font-medium`}
+                      ? "bg-gray-900 text-white py-2 px-4 rounded opacity-50 cursor-not-allowed"
+                      : "bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded cursor-pointer"
+                  }`}
+                  onClick={() =>
+                    document.getElementById("uploadCategoryImage").click()
+                  }
                 >
                   Carregar foto
-                </div>
+                </button>
                 <input
-                  disable={!data.name}
+                  disabled={!data.name}
                   onChange={handleUploadCategoryImage}
                   type="file"
                   id="uploadCategoryImage"
@@ -117,11 +128,13 @@ const UploadCategoryModel = ({ close, fetchData }) => {
           </div>
 
           <button
-            className={`${
-              data.name && data.image
-                ? "bg-gradient-to-r from-green-500 to-yellow-500 rounded-full"
-                : "bg-gradient-to-r from-green-500 to-yellow-600 rounded-full"
-            }py-2 font-semibold`}
+            type="submit"
+            disabled={!(data.name && data.image)}
+            className={`min-w-20 ${
+              !(data.name && data.image)
+                ? "bg-gray-900 text-white py-2 px-4 rounded opacity-50 cursor-not-allowed"
+                : "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded cursor-pointer"
+            }`}
           >
             Adicionar categoria
           </button>

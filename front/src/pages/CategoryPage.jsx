@@ -7,7 +7,7 @@ const CategoryPage = () => {
   return (
     <section>
       <div className="p-2 bg-white shadow-md flex items-center justify-between rounded">
-        <h2 className="font-semibold">Categoriaaa</h2>
+        <h2 className="font-semibold">Categoria</h2>
         <button
           onClick={() => setOpenUploadCategory(true)}
           className="text-sm font-bold text-white min-w-20 border border-red-600 hover:border-green-600 hover:bg-yellow-600 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 via-orange-500 to-yellow cursor-pointer"
