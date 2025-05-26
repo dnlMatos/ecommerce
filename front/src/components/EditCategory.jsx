@@ -1,20 +1,22 @@
 import React, { useState } from "react";
-import { IoClose } from "react-icons/io5";
 import Axios from "../utils/Axios";
 import { SummaryApi } from "../common/SummaryApi";
 import AxiosToastError from "../utils/AxiosToastError";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import uploadImage from "../utils/uploadImage";
+import { IoClose } from "react-icons/io5";
 
-const UploadCategoryModel = ({ close, fetchData }) => {
-  const [loading, setLoading] = useState(false);
+export const EditCategory = ({ close, fetchData, CategoryData }) => {
   const [data, setData] = useState({
-    name: "",
-    image: "", // Corrigido: valor inicial string vazia
+    _id: CategoryData._id,
+    name: CategoryData.name,
+    image: CategoryData.image,
   });
+  const [loading, setLoading] = useState(false);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
+
     setData((prev) => {
       return {
         ...prev,
@@ -27,7 +29,10 @@ const UploadCategoryModel = ({ close, fetchData }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await Axios({ ...SummaryApi.addCategory, data: data });
+      const response = await Axios({
+        ...SummaryApi.updateCategory,
+        data: data,
+      });
       const { data: responseData } = response;
 
       if (responseData.success) {
@@ -42,71 +47,48 @@ const UploadCategoryModel = ({ close, fetchData }) => {
     }
   };
 
-  // const handleUploadCategoryImage=async (e) => {
-  //   const file = e.target.files[0];
-  //   if (!file) return;
-  //     const response = await uploadImage(file);
-  //     const {data: ImageResponse} = response;
-
-  //       setData((prev) => ({
-  //         ...prev,
-  //         image: ImageResponse.data.url,
-  //       }));
-  //     toast.error("Erro ao fazer upload da imagem.", error);
-  //   }
-  // };
-
   const handleUploadCategoryImage = async (e) => {
     const file = e.target.files[0];
+
     if (!file) return;
-    try {
-      const response = await uploadImage(file);
-      if (
-        response &&
-        response.data &&
-        response.data.data &&
-        response.data.data.url
-      ) {
-        setData((prev) => ({
-          ...prev,
-          image: response.data.data.url,
-        }));
-      } else {
-        toast.error("Erro ao fazer upload da imagem.");
-      }
-    } catch (error) {
-      toast.error("Erro ao fazer upload da imagem.", error);
-    }
+
+    setLoading(true);
+
+    const response = await uploadImage(file);
+    const { data: responseData } = response;
+    setLoading(false);
+
+    setData((prev) => ({
+      ...prev,
+      image: responseData.data.url,
+    }));
   };
 
   return (
-    <section
-      style={{ backgroundColor: "rgba(0,0,0,0.6 )" }}
-      className="fixed inset-0 p-4 flex items-center justify-center"
-    >
-      <div className="bg-white w-full p-4 rounded max-w-4xl">
+    <section className="fixed top-0 bottom-0 left-0 right-0 p-4 bg-neutral-800 opacity-60 flex items-center justify-center">
+      <div className="bg-white max-w-4xl w-full p-4 rounded">
         <div className="flex items-center justify-between">
-          <h1 className="font-semibold">Categoria</h1>
-          <button
-            onClick={close}
-            className="w-fit block ml-auto cursor-pointer"
-          >
+          <h1 className="font-semibold">Atualizar categoria</h1>
+          <button onClick={() => close()} className="w-fit block ml-auto">
             <IoClose size={25} />
           </button>
         </div>
-        <form action="" className="my-3 grid gap-2" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="my-3 grid gap-2">
           <div className="grid gap-1">
-            <label id="categoryName">Nome</label>
+            <label htmlFor="" id="categoryName">
+              Nome
+            </label>
             <input
               type="text"
-              name="name"
               id="categoryName"
-              className="bg-blue-50 p-2 border outline-blue-100 focus-within:border-primary-200 outline-none rounded"
               placeholder="Nome da categoria"
               value={data.name}
+              name="name"
               onChange={handleOnChange}
+              className="bg-blue-50 p-2 border border-blue-100 focus-within:border-primary-200 outline-none rounded"
             />
           </div>
+
           <div className="grid gap-1">
             <p>Foto</p>
             <div className="flex gap-4 flex-col lg:flex-row items-center">
@@ -156,12 +138,10 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                 : "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded cursor-pointer"
             }`}
           >
-            Adicionar categoria
+            Atualizar categoria
           </button>
         </form>
       </div>
     </section>
   );
 };
-
-export default UploadCategoryModel;

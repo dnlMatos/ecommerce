@@ -67,4 +67,19 @@ export const SummaryApi = {
     url: `/api/file/upload`,
     method: "POST",
   },
+
+  getCategory: {
+    url: `/api/category/get`,
+    method: "GET",
+  },
+
+  uploadCategory: {
+    url: `/api/category/update`,
+    method: "PUT",
+  },
+
+  deleteCategory: {
+    url: `/api/category/delete`,
+    method: "DELETE",
+  },
 };
