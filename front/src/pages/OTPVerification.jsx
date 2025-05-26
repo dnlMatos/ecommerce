@@ -13,8 +13,6 @@ const OtpVerification = () => {
   const inputRef = useRef([]);
   const location = useLocation();
 
-  console.log("location", location);
-
   useEffect(() => {
     if (!location?.state?.email) {
       navigate("/forgot-password");

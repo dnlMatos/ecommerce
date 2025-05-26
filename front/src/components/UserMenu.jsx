@@ -102,7 +102,7 @@ const UserMenu = ({ close }) => {
         </Link>
         <button
           onClick={handleLogout}
-          className="text-semibold bg-gradient-to-r from-orange-320 via-orange-600 text-center text-white text-lg rounded-lg py-2 px-2"
+          className="text-semibold bg-gradient-to-r from-orange-320 via-orange-600 text-center text-white text-lg rounded-lg py-2 px-2 cursor-pointer"
         >
           Sair
         </button>

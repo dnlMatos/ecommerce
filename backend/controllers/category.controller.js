@@ -1,4 +1,6 @@
 import CategoryModel from "../models/category.model.js";
+import SubCategoryModel from "../models/subCategory.model.js";
+import ProductModel from "../models/product.model.js";
 
 export const AddCategoryController = async (req, res) => {
   try {
@@ -48,9 +50,9 @@ export const getCategoryController = async (req, res) => {
 
     return res.json({
       message: "Categorias encontradas",
+      data: data,
       error: false,
       success: true,
-      data,
     });
   } catch (error) {
     return res.status(500).json({
@@ -90,7 +92,7 @@ export const updateCategoryController = async (req, res) => {
 
 export const deleteCategoryController = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { _id } = req.body;
 
     const checkSubCategory = await SubCategoryModel.find({
       category: {
@@ -112,7 +114,9 @@ export const deleteCategoryController = async (req, res) => {
       });
     }
 
-    const deleteCategory = await CategoryModel.deleteOne({ _id: id });
+    const deleteCategory = await CategoryModel.deleteOne({ _id: _id });
+
+    console.log(deleteCategory);
 
     return res.json({
       message: "Categoria deletada com sucesso",
