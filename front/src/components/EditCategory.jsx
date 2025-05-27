@@ -6,14 +6,13 @@ import toast from "react-hot-toast";
 import uploadImage from "../utils/uploadImage";
 import { IoClose } from "react-icons/io5";
 
-export const EditCategory = ({ close, fetchData, CategoryData }) => {
+export const EditCategory = ({ close, fetchData, editData }) => {
   const [data, setData] = useState({
-    _id: CategoryData._id,
-    name: CategoryData.name,
-    image: CategoryData.image,
+    _id: editData._id,
+    name: editData.name,
+    image: editData.image,
   });
   const [loading, setLoading] = useState(false);
-
   const handleOnChange = (e) => {
     const { name, value } = e.target;
 
