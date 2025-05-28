@@ -8,6 +8,7 @@ import { EditCategory } from "../components/EditCategory";
 import { ConfirmBox } from "../components/ConfirmBox";
 import NoData from "../components/NoData";
 import FadeLoader from "react-spinners/FadeLoader";
+import { useSelector } from "react-redux";
 
 const CategoryPage = () => {
   const [loadingData, setLoadingData] = useState(false);
@@ -22,6 +23,8 @@ const CategoryPage = () => {
     name: "",
     image: "",
   });
+
+  const allCategory = useSelector((state) => state.product.allCategory);
 
   const fetchCategory = async () => {
     try {
@@ -60,8 +63,8 @@ const CategoryPage = () => {
   };
 
   useEffect(() => {
-    fetchCategory();
-  }, []);
+    setCategoryData(allCategory);
+  }, [allCategory]);
 
   return (
     <section className="">

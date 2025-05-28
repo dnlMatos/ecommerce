@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { IoClose } from "react-icons/io5";
 import Axios from "../utils/Axios";
 import { SummaryApi } from "../common/SummaryApi";
 import AxiosToastError from "../utils/AxiosToastError";

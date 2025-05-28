@@ -7,19 +7,38 @@ import { useEffect } from "react";
 import fetchUserDetails from "./utils/fetchUserDetails";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "./store/userSlice";
+import Axios from "./utils/Axios";
+import { SummaryApi } from "./common/SummaryApi";
+import { setAllCategory } from "./store/productSlice";
 
 function App() {
   const dispatch = useDispatch();
   // Função para buscar os dados do usuário
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userData = await fetchUserDetails();
-      if (userData && userData.data) {
-        dispatch(setUserDetails(userData.data));
+
+  const fetchUser = async () => {
+    const userData = await fetchUserDetails();
+    dispatch(setUserDetails(userData.data));
+  };
+
+  const fetchCategory = async () => {
+    try {
+      const response = await Axios({
+        ...SummaryApi.getCategory,
+      });
+
+      const { data: responseData } = response;
+      if (responseData.sucess) {
+        dispatch(setAllCategory(responseData.data));
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
     fetchUser();
-  }, [dispatch]);
+    fetchCategory();
+  }, []);
 
   return (
     <>
