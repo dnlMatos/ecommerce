@@ -11,7 +11,6 @@ import isAdmin from "../utils/isAdmin";
 
 const UserMenu = ({ close }) => {
   const user = useSelector((state) => state.user);
-  console.log(user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

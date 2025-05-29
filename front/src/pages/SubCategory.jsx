@@ -3,11 +3,21 @@ import UploadSubCategoryModel from "../components/UploadSubCategoryModel";
 import Axios from "../utils/Axios";
 import { SummaryApi } from "../common/SummaryApi";
 import AxiosToastError from "../utils/AxiosToastError";
+import DisplayTable from "../components/DisplayTable";
+import { createColumnHelper } from "@tanstack/react-table";
+import ViewImage from "../components/ViewImage";
+import { MdDelete } from "react-icons/md";
+import { HiPencil } from "react-icons/hi";
+import EditSubCategory from "../components/EditSubCategory";
 
 const SubCategory = () => {
   const [openAddSubCategory, setOpenAddSubCategory] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const columnHelper = createColumnHelper();
+  const [ImageURL, setImageURL] = useState("");
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editData, setEditData] = useState({ _id: "" });
 
   const fetchSubCategory = async () => {
     setLoading(true);
@@ -27,6 +37,73 @@ const SubCategory = () => {
     }
   };
 
+  const column = [
+    columnHelper.accessor("name", { header: "Nome" }),
+    columnHelper.accessor("image", {
+      header: "Foto",
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-center items-center">
+            <img
+              src={row.original.image}
+              alt={row.original.name}
+              className="w-10 h-10 cursor-pointer"
+              onClick={() => {
+                setImageURL(row.original.image);
+              }}
+            />
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor("category", {
+      header: "Categoria",
+      cell: ({ row }) => {
+        return (
+          <>
+            {row.original.category.map((c, index) => {
+              return (
+                <p
+                  key={c._id + "table"}
+                  className="shadow-md px-1 inline-block"
+                >
+                  {c.name}
+                </p>
+              );
+            })}
+          </>
+        );
+      },
+    }),
+    columnHelper.accessor("_id", {
+      header: "Action",
+      cell: ({ row }) => {
+        return (
+          <div className="flex itemns-center justify-center gap-3">
+            <button
+              onClick={() => {
+                setOpenEdit(true);
+                setEditData(row.original);
+              }}
+              className="p-2 bg-green-500 rounded hover:text-white"
+            >
+              <HiPencil size={20} />
+            </button>
+            <button
+              onClick={() => {
+                setOpenDeleteConfirmBox(true);
+                setDeleteSubCategory(row.original);
+              }}
+              className="p-2 bg-red-100 rounded text-red-500 hover:text-red-600"
+            >
+              <MdDelete size={20} />
+            </button>
+          </div>
+        );
+      },
+    }),
+  ];
+
   useEffect(() => {
     fetchSubCategory();
   }, []);
@@ -42,10 +119,24 @@ const SubCategory = () => {
           Adicionar Subcategoria
         </button>
       </div>
+
+      <div>
+        <DisplayTable data={data} column={column} />
+      </div>
+
       {openAddSubCategory && (
         <UploadSubCategoryModel
           fetchData={() => {}}
           onClick={() => setOpenAddSubCategory(false)}
+        />
+      )}
+
+      {ImageURL && <ViewImage url={ImageURL} close={() => setImageURL("")} />}
+      {openEdit && (
+        <EditSubCategory
+          fetchData={fetchSubCategory}
+          data={editData}
+          close={() => setOpenEdit(false)}
         />
       )}
     </section>
