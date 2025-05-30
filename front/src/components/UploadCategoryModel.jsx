@@ -37,21 +37,19 @@ const UploadCategoryModel = ({ close, fetchData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setOpen(!open);
       setLoading(true);
       const response = await Axios({ ...SummaryApi.addCategory, data: data });
       const { data: responseData } = response;
 
       if (responseData.success) {
         toast.success(responseData.message);
-        setOpen(!open);
-        close();
         fetchData();
       }
+      close();
+      setOpen(!open);
     } catch (error) {
       AxiosToastError(error);
     } finally {
-      setOpen(!open);
       setLoading(false);
     }
   };

@@ -10,10 +10,12 @@ const subCategorySchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    category: {
-      type: mongoose.Schema.ObjectId,
-      ref: "category",
-    },
+    category: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "category",
+      },
+    ],
   },
   {
     timestamps: true,

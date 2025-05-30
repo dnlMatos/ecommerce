@@ -23,9 +23,13 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
 
   const allCategory = useSelector((state) => state.product.allCategory);
 
+  const handleClose = () => {
+    setOpen(!open);
+    closeModal();
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setSubCategoryData((prev) => {
       return {
         ...prev,
@@ -37,14 +41,24 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
   const handleUploadSubCategoryImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    const response = await uploadImage(file);
-    const { data: ImageResponse } = response;
-
-    setSubCategoryData((prev) => ({
-      ...prev,
-      image: response.data.data.url,
-    }));
+    try {
+      const response = await uploadImage(file);
+      if (
+        response &&
+        response.data &&
+        response.data.data &&
+        response.data.data.url
+      ) {
+        setSubCategoryData((prev) => ({
+          ...prev,
+          image: response.data.data.url,
+        }));
+      } else {
+        toast.error("Erro ao fazer upload da imagem.");
+      }
+    } catch (error) {
+      toast.error("Erro ao fazer upload da imagem.", error);
+    }
   };
 
   const handleRemoveCategorySelected = (categoryId) => {
@@ -63,7 +77,6 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
   const handleSubmitSubCategory = async (e) => {
     e.preventDefault();
     try {
-      setOpen(!open);
       setLoading(true);
       const response = await Axios({
         ...SummaryApi.createSubCategory,
@@ -73,34 +86,22 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
 
       if (responseData.success) {
         toast.success(responseData.message);
-
-        if (fetchData) fetchData();
-        setOpen(!open);
-        handleClose();
+        fetchData();
       }
+      setOpen(!open);
+      closeModal();
     } catch (error) {
       AxiosToastError(error);
     } finally {
-      setOpen(!open);
       setLoading(false);
     }
-  };
-
-  const handleClose = () => {
-    setSubCategoryData({
-      name: "",
-      image: "",
-      category: [],
-    });
-
-    if (closeModal) closeModal();
   };
 
   return (
     <section className="top-0 left-0 right-0 p-4 bg-neutral-800 bg-opacity-60 flex items-center">
       <Dialog
         open={open}
-        onClick={close}
+        onClick={closeModal}
         onClose={setOpen}
         className="relative z-10"
       >
@@ -145,7 +146,7 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
                         <div className="grid gap-1">
                           <p>Foto</p>
                           <div className="flex gap-4 flex-col sm:flex-row lg:flex-row items-center">
-                            <div className="border bg-blue-50 h-36 w-full lg:w-36 flex items-center justify-center rounded">
+                            <div className="border bg-blue-50 h-36 w-36 lg:w-36 flex items-center justify-center rounded">
                               {subCategoryData.image ? (
                                 <img
                                   alt="subcategory"
@@ -169,7 +170,7 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
                                 }`}
                                 onClick={() =>
                                   document
-                                    .getElementById("uploadCategoryImage")
+                                    .getElementById("uploadSubCategoryImage")
                                     .click()
                                 }
                               >
@@ -186,20 +187,61 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
                           </div>
                         </div>
 
-                        <div className="grid gap-1">
+                        {/* <div className="grid gap-1">
                           <label id="categoryName">Selecione a categoria</label>
                           <div className="border focus-whithin:border-primary-200 rounded">
                             <div className="flex flex-wrap gap-2"></div>
                           </div>
+                          {allCategory.map((cat, index) => {
+                            return (
+                              <p
+                                key={cat._id + "selectedValue"}
+                                className="bg-white shadow-md px-1 m-1 flex items-center gap-2"
+                              >
+                                {cat.name}
+                                <div
+                                  className="cursor-pointer hover:text-red-600"
+                                  onClick={() =>
+                                    handleRemoveCategorySelected(cat._id)
+                                  }
+                                ></div>
+                              </p>
+                            );
+                          })}
+                        </div> */}
 
-                          <input
-                            name="name"
-                            id="name"
-                            className="bg-blue-50 p-2 border outline-blue-100 focus-within:border-primary-200 outline-none rounded"
-                            placeholder="Nome da categoria"
-                            value={subCategoryData.name}
-                            onChange={handleChange}
-                          />
+                        <div className="grid gap-1">
+                          <label id="categoryName">Selecione a categoria</label>
+                          <select
+                            multiple
+                            className="border rounded w-full focus:border-primary-200"
+                            value={subCategoryData.category.map(
+                              (cat) => cat._id
+                            )}
+                            onChange={(e) => {
+                              const selectedOptions = Array.from(
+                                e.target.selectedOptions
+                              ).map((option) => option.value);
+                              // Mapeia os _id selecionados para os objetos de categoria completos
+                              const selectedCategories = allCategory.filter(
+                                (cat) => selectedOptions.includes(cat._id)
+                              );
+                              setSubCategoryData((prev) => ({
+                                ...prev,
+                                category: selectedCategories,
+                              }));
+                            }}
+                          >
+                            {allCategory.map((cat) => (
+                              <option
+                                key={cat._id}
+                                value={cat._id}
+                                className="hover:bg-[#155dfc] hover:text-white p-1 rounded"
+                              >
+                                {cat.name}
+                              </option>
+                            ))}
+                          </select>
                         </div>
 
                         <div className="flex justify-around mt-3">
@@ -212,10 +254,18 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
                           <button
                             type="submit"
                             disabled={
-                              !(subCategoryData.name && subCategoryData.image)
+                              !(
+                                subCategoryData.name &&
+                                subCategoryData.image &&
+                                subCategoryData.category.length > 0
+                              )
                             }
                             className={`min-w-20 ${
-                              !(subCategoryData.name && subCategoryData.image)
+                              !(
+                                subCategoryData.name &&
+                                subCategoryData.image &&
+                                subCategoryData.category.length > 0
+                              )
                                 ? "bg-gray-900 text-white py-2 px-4 rounded opacity-50 cursor-not-allowed"
                                 : "bg-green-200 hover:bg-green-300 text-green-700 py-2 px-4 rounded cursor-pointer"
                             }`}

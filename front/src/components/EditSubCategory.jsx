@@ -77,7 +77,7 @@ const EditSubCategory = ({ close, data, fetchData }) => {
   };
 
   return (
-    <section className="fixed top-0 bottom-0 left-0 right-0 p-4 bg-neutral-800 opacity-60 flex items-center justify-center">
+    <section className="fixed top-0 bottom-0 left-0 right-0 p-4 bg-neutral-800 flex items-center justify-center">
       <div className="bg-white max-w-5xl w-full p-4 rounded">
         <div className="flex items-center justify-between gap-3">
           <h1 className="font-semibold">Editar subcategoria</h1>
