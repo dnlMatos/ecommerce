@@ -62,21 +62,14 @@ const SubCategory = () => {
         return (
           <>
             {row.original.category.map((c, index) => {
-              return (
-                <p
-                  key={c._id + "table"}
-                  className="shadow-md px-1 inline-block"
-                >
-                  {c.name}
-                </p>
-              );
+              return <> {c.name}</>;
             })}
           </>
         );
       },
     }),
     columnHelper.accessor("_id", {
-      header: "Action",
+      header: "Ação",
       cell: ({ row }) => {
         return (
           <div className="flex itemns-center justify-center gap-3">
@@ -85,7 +78,7 @@ const SubCategory = () => {
                 setOpenEdit(true);
                 setEditData(row.original);
               }}
-              className="p-2 bg-green-500 rounded hover:text-white"
+              className="p-2 bg-green-500 rounded hover:text-white cursor-pointer"
             >
               <HiPencil size={20} />
             </button>
@@ -94,7 +87,7 @@ const SubCategory = () => {
                 setOpenDeleteConfirmBox(true);
                 setDeleteSubCategory(row.original);
               }}
-              className="p-2 bg-red-100 rounded text-red-500 hover:text-red-600"
+              className="p-2 bg-red-100 rounded text-red-500 hover:text-red-600 cursor-pointer"
             >
               <MdDelete size={20} />
             </button>

@@ -12,8 +12,8 @@ const DisplayTable = ({ data, column }) => {
   });
 
   return (
-    <div className="p-2">
-      <table className="w-full py-0 px-0 border-collapse">
+    <div className="mt-2">
+      <table className="w-full border-collapse">
         <thead className="bg-black text-white">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -33,13 +33,15 @@ const DisplayTable = ({ data, column }) => {
         </thead>
         <tbody>
           {table.getRowModel().rows.map((row, index) => (
-            <tr key={row.id}>
-              <td className="border px-2 py-1">{index + 1}</td>
+            <tr
+              key={row.id}
+              className={`transition-colors duration-200 ${
+                index % 2 === 0 ? "bg-gray-100" : "bg-white"
+              } hover:bg-gray-300`}
+            >
+              <td className="px-2 py-1">{index + 1}</td>
               {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className="border px-2 py-1 whitespace-nowrap"
-                >
+                <td key={cell.id} className="px-2 py-1 whitespace-nowrap">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
