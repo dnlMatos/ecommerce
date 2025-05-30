@@ -3,7 +3,6 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React from "react";
 
 const DisplayTable = ({ data, column }) => {
   const table = useReactTable({
@@ -20,7 +19,7 @@ const DisplayTable = ({ data, column }) => {
             <tr key={headerGroup.id}>
               <th>Código</th>
               {headerGroup.headers.map((header) => (
-                <th hey={header.id} className="border whitespace-nowrap">
+                <th key={header.id} className="border whitespace-nowrap">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
