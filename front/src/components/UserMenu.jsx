@@ -7,9 +7,11 @@ import AxiosToastError from "../utils/AxiosToastError";
 import toast from "react-hot-toast";
 import { logout } from "../store/userSlice";
 import { HiExternalLink } from "react-icons/hi";
+import isAdmin from "../utils/isAdmin";
 
 const UserMenu = ({ close }) => {
   const user = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -40,52 +42,62 @@ const UserMenu = ({ close }) => {
 
   return (
     <div>
-      <div className="font-semibold">
-        Minha conta
-        <div className="text-sm items-center gap-2">
-          <span className="max-w-52 text-ellipsis line-clamp-1">
-            {user.name || user.mobile}
-          </span>
-          <Link
-            onClick={handleClose}
-            className="hover:text-green-600"
-            to={"/dashboard/profile"}
-          >
-            <HiExternalLink size={20} />
-          </Link>
-        </div>
+      <div className="font-semibold">Minha conta</div>
+      <div className="text-sm items-center gap-2">
+        <span className="max-w-52 text-ellipsis line-clamp-1">
+          {user.name || user.mobile}
+          <span>{user.role === "ADMIN" ? "[Admin]" : ""}</span>
+        </span>
+        <Link
+          onClick={handleClose}
+          className="hover:text-green-600"
+          to={"/dashboard/profile"}
+        >
+          <HiExternalLink size={20} />
+        </Link>
       </div>
-
       <Divider />
       <div className="text-sm grid gap-2">
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/category"}
-          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
-        >
-          Categoria
-        </Link>
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/subcategory"}
-          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
-        >
-          Sub-categoria
-        </Link>
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/upload-product"}
-          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
-        >
-          Carregar produto
-        </Link>
-        <Link
-          onClick={handleClose}
-          to={"/dashboard/product"}
-          className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
-        >
-          Produto
-        </Link>
+        {isAdmin(user.role) && (
+          <Link
+            onClick={handleClose}
+            to={"/dashboard/category"}
+            className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+          >
+            Categoria
+          </Link>
+        )}
+
+        {isAdmin(user.role) && (
+          <Link
+            onClick={handleClose}
+            to={"/dashboard/subcategory"}
+            className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+          >
+            Sub-categoria
+          </Link>
+        )}
+
+        {isAdmin(user.role) && (
+          <Link
+            onClick={handleClose}
+            to={"/dashboard/upload-product"}
+            className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+          >
+            Carregar produto
+          </Link>
+        )}
+
+        {isAdmin(user.role) && (
+          <Link
+            onClick={handleClose}
+            to={"/dashboard/product"}
+            className="px-2 hover:bg-gradient-to-r from-orange-320 via-orange-600"
+          >
+            Produto
+          </Link>
+        )}
+
         <Link
           onClick={handleClose}
           to={"/dashboard/myorders"}
@@ -93,6 +105,7 @@ const UserMenu = ({ close }) => {
         >
           Meus Pedidos
         </Link>
+
         <Link
           onClick={handleClose}
           to={"/dashboard/address"}
@@ -100,6 +113,7 @@ const UserMenu = ({ close }) => {
         >
           Meu endereço
         </Link>
+
         <button
           onClick={handleLogout}
           className="text-semibold bg-gradient-to-r from-orange-320 via-orange-600 text-center text-white text-lg rounded-lg py-2 px-2 cursor-pointer"

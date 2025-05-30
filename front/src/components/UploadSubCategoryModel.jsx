@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import uploadImage from "../utils/uploadImage";
+import toast from "react-hot-toast";
 import Axios from "../utils/Axios";
 import { SummaryApi } from "../common/SummaryApi";
 import AxiosToastError from "../utils/AxiosToastError";
-import { toast } from "react-hot-toast";
-import uploadImage from "../utils/uploadImage";
 import {
   Dialog,
   DialogBackdrop,
@@ -11,22 +12,21 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 
-const UploadCategoryModel = ({ close, fetchData }) => {
+const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
   const [open, setOpen] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({
+  const [subCategoryData, setSubCategoryData] = useState({
     name: "",
     image: "",
+    category: [],
   });
 
-  const handleClose = () => {
-    setOpen(!open);
-    close();
-  };
+  const allCategory = useSelector((state) => state.product.allCategory);
 
-  const handleOnChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setData((prev) => {
+
+    setSubCategoryData((prev) => {
       return {
         ...prev,
         [name]: value,
@@ -34,19 +34,49 @@ const UploadCategoryModel = ({ close, fetchData }) => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleUploadSubCategoryImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const response = await uploadImage(file);
+    const { data: ImageResponse } = response;
+
+    setSubCategoryData((prev) => ({
+      ...prev,
+      image: response.data.data.url,
+    }));
+  };
+
+  const handleRemoveCategorySelected = (categoryId) => {
+    const index = subCategoryData.category.findIndex(
+      (el) => el._id === categoryId
+    );
+
+    subCategoryData.category.splice(index, 1);
+    setSubCategoryData((prev) => {
+      return {
+        ...prev,
+      };
+    });
+  };
+
+  const handleSubmitSubCategory = async (e) => {
     e.preventDefault();
     try {
       setOpen(!open);
       setLoading(true);
-      const response = await Axios({ ...SummaryApi.addCategory, data: data });
+      const response = await Axios({
+        ...SummaryApi.createSubCategory,
+        data: subCategoryData,
+      });
       const { data: responseData } = response;
 
       if (responseData.success) {
         toast.success(responseData.message);
+
+        if (fetchData) fetchData();
         setOpen(!open);
-        close();
-        fetchData();
+        handleClose();
       }
     } catch (error) {
       AxiosToastError(error);
@@ -56,27 +86,14 @@ const UploadCategoryModel = ({ close, fetchData }) => {
     }
   };
 
-  const handleUploadCategoryImage = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
-      const response = await uploadImage(file);
-      if (
-        response &&
-        response.data &&
-        response.data.data &&
-        response.data.data.url
-      ) {
-        setData((prev) => ({
-          ...prev,
-          image: response.data.data.url,
-        }));
-      } else {
-        toast.error("Erro ao fazer upload da imagem.");
-      }
-    } catch (error) {
-      toast.error("Erro ao fazer upload da imagem.", error);
-    }
+  const handleClose = () => {
+    setSubCategoryData({
+      name: "",
+      image: "",
+      category: [],
+    });
+
+    if (closeModal) closeModal();
   };
 
   return (
@@ -105,34 +122,34 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                       as="h3"
                       className="text-base font-semibold text-gray-900"
                     >
-                      Cadastro categoria
+                      Cadastro Subcategoria
                     </DialogTitle>
                     <div className="mt-2">
                       <form
                         action=""
                         className="my-3 grid gap-2"
-                        onSubmit={handleSubmit}
+                        onSubmit={handleSubmitSubCategory}
                       >
                         <div className="grid gap-1">
                           <label id="categoryName">Nome</label>
                           <input
-                            type="text"
                             name="name"
-                            id="categoryName"
+                            id="name"
                             className="bg-blue-50 p-2 border outline-blue-100 focus-within:border-primary-200 outline-none rounded"
                             placeholder="Nome da categoria"
-                            value={data.name}
-                            onChange={handleOnChange}
+                            value={subCategoryData.name}
+                            onChange={handleChange}
                           />
                         </div>
+
                         <div className="grid gap-1">
                           <p>Foto</p>
                           <div className="flex gap-4 flex-col sm:flex-row lg:flex-row items-center">
                             <div className="border bg-blue-50 h-36 w-full lg:w-36 flex items-center justify-center rounded">
-                              {data.image ? (
+                              {subCategoryData.image ? (
                                 <img
-                                  alt="category"
-                                  src={data.image}
+                                  alt="subcategory"
+                                  src={subCategoryData.image}
                                   className="w-full h-full object-scale-down"
                                 />
                               ) : (
@@ -141,12 +158,12 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                                 </p>
                               )}
                             </div>
-                            <label htmlFor="uploadCategoryImage">
+                            <label htmlFor="uploadSubCategoryImage">
                               <button
                                 type="button"
-                                disabled={!data.name}
+                                disabled={!subCategoryData.name}
                                 className={`min-w-20 ${
-                                  !data.name
+                                  !subCategoryData.name
                                     ? "bg-gray-900 text-white py-2 px-4 rounded opacity-50 cursor-not-allowed"
                                     : "bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded cursor-pointer"
                                 }`}
@@ -159,14 +176,30 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                                 Carregar foto
                               </button>
                               <input
-                                disabled={!data.name}
-                                onChange={handleUploadCategoryImage}
+                                disabled={!subCategoryData.name}
+                                onChange={handleUploadSubCategoryImage}
                                 type="file"
-                                id="uploadCategoryImage"
+                                id="uploadSubCategoryImage"
                                 className="hidden"
                               />
                             </label>
                           </div>
+                        </div>
+
+                        <div className="grid gap-1">
+                          <label id="categoryName">Selecione a categoria</label>
+                          <div className="border focus-whithin:border-primary-200 rounded">
+                            <div className="flex flex-wrap gap-2"></div>
+                          </div>
+
+                          <input
+                            name="name"
+                            id="name"
+                            className="bg-blue-50 p-2 border outline-blue-100 focus-within:border-primary-200 outline-none rounded"
+                            placeholder="Nome da categoria"
+                            value={subCategoryData.name}
+                            onChange={handleChange}
+                          />
                         </div>
 
                         <div className="flex justify-around mt-3">
@@ -178,14 +211,16 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                           </button>
                           <button
                             type="submit"
-                            disabled={!(data.name && data.image)}
+                            disabled={
+                              !(subCategoryData.name && subCategoryData.image)
+                            }
                             className={`min-w-20 ${
-                              !(data.name && data.image)
+                              !(subCategoryData.name && subCategoryData.image)
                                 ? "bg-gray-900 text-white py-2 px-4 rounded opacity-50 cursor-not-allowed"
                                 : "bg-green-200 hover:bg-green-300 text-green-700 py-2 px-4 rounded cursor-pointer"
                             }`}
                           >
-                            Cadastrar
+                            Cadastrarrrrrrrrrrr
                           </button>
                         </div>
                       </form>
@@ -201,4 +236,4 @@ const UploadCategoryModel = ({ close, fetchData }) => {
   );
 };
 
-export default UploadCategoryModel;
+export default UploadSubCategoryModel;
