@@ -51,6 +51,7 @@ const EditSubCategory = ({ close, data, fetchData }) => {
     setSubCategoryData((prev) => {
       return {
         ...prev,
+        category: prev.category.filter((cat) => cat._id !== categoryId),
       };
     });
   };
@@ -59,10 +60,13 @@ const EditSubCategory = ({ close, data, fetchData }) => {
     e.preventDefault();
 
     try {
-      const response = await Axios({
-        ...SummaryApi.updateSubCategory,
-        data: subCategoryData,
-      });
+      const response = await Axios(
+        {
+          ...SummaryApi.updateSubCategory,
+          data: subCategoryData,
+        },
+        console.log(subCategoryData)
+      );
 
       const { data: responseData } = response;
 
@@ -103,35 +107,36 @@ const EditSubCategory = ({ close, data, fetchData }) => {
             <p>Foto</p>
             <div className="flex gap-4 flex-col lg:flex-row items-center">
               <div className="border bg-blue-50 h-36 w-full lg:w-36 flex items-center justify-center rounded">
-                {subCategoryData.image ? (
+                {!subCategoryData.image ? (
+                  <p className="text-center">Nenhuma foto selecionada</p>
+                ) : (
                   <img
-                    alt="subcategory"
                     src={subCategoryData.image}
+                    alt="subCategory"
                     className="w-full h-full object-scale-down"
                   />
-                ) : (
-                  <p className="text-sm text-neutral-500">Sem foto</p>
                 )}
               </div>
               <label htmlFor="uploadSubCategoryImage">
                 <button
-                  disabled={!subCategoryData.name}
-                  className={`min-w-20 ${
-                    !subCategoryData.name
-                      ? "bg-gray-900 text-white py-2 px-4 rounded opacity-50 cursor-not-allowed"
-                      : "bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded cursor-pointer"
-                  }`}
-                  onClick={() =>
-                    document.getElementById("uploadCategoryImage").click()
-                  }
+                  type="button"
+                  disabled={!subCategoryData.image}
+                  className={`${
+                    !subCategoryData.image
+                      ? "bg-gray-900 text-white py-2 px-4 opacity-50 cursor-not-allowed"
+                      : "bg-blue-500 hover:bg-blue-600 text-white py-2 px-4  "
+                  } p-2 cursor-pointer rounded`}
+                  onClick={() => {
+                    document.getElementById("uploadSubCategoryImage").click();
+                  }}
                 >
                   Carregar foto
                 </button>
                 <input
-                  disabled={!subCategoryData.name}
-                  onChange={handleUploadSubCategoryImage}
                   type="file"
-                  id="uploadCategoryImage"
+                  id="uploadSubCategoryImage"
+                  disabled={!subCategoryData.image}
+                  onChange={handleUploadSubCategoryImage}
                   className="hidden"
                 />
               </label>
@@ -142,27 +147,25 @@ const EditSubCategory = ({ close, data, fetchData }) => {
             <label htmlFor="">Selecione a categoria</label>
             <div className="border focus-within:border-primary-200 rounded">
               <div className="flex flex-wrap gap-2">
-                {subCategoryData.category.map((cat, index) => {
+                {subCategoryData.category.map((cat) => {
                   return (
-                    <p
+                    <div
                       key={cat._id + "selectedValue"}
                       className="bg-white shadow-md px-1 m-1 flex items-center gap-2"
                     >
                       {cat.name}
-                      <div
+                      <span
                         className="cursor-pointer hover:test-red-600"
                         onClick={() => handleRemoveCategorySelected(cat._id)}
                       >
                         <IoClose size={20} />
-                      </div>
-                    </p>
+                      </span>
+                    </div>
                   );
                 })}
               </div>
 
               <select
-                name=""
-                id=""
                 className="w-full p-2 bg-transparent outline-none border"
                 onChange={(e) => {
                   const value = e.target.value;
@@ -170,20 +173,20 @@ const EditSubCategory = ({ close, data, fetchData }) => {
                     (el) => el._id == value
                   );
 
-                  subCategoryData((prev) => {
+                  setSubCategoryData((prev) => {
                     return {
                       ...prev,
-                      category: [...prev.categoy, categoryDetails],
+                      category: [...prev.category, categoryDetails],
                     };
                   });
                 }}
               >
                 <option value={""}>Selecione a categoria</option>
-                {allCategory.map((category, index) => {
+                {allCategory.map((category) => {
                   return (
                     <option
                       value={category?._id}
-                      key={category._id + "aubcategory"}
+                      key={category._id + "subcategory"}
                     >
                       {category?.name}
                     </option>
@@ -195,12 +198,18 @@ const EditSubCategory = ({ close, data, fetchData }) => {
 
           <button
             type="submit"
-            disabled={!(subCategoryData.name && subCategoryData.image)}
+            disabled={
+              !(
+                subCategoryData.name &&
+                subCategoryData.image &&
+                subCategoryData.category.length > 0
+              )
+            }
             className={`min-w-20 ${
               !(
                 subCategoryData.name &&
                 subCategoryData.image &&
-                subCategoryData.category[0]
+                subCategoryData.category.length > 0
               )
                 ? "bg-gray-900 text-white py-2 px-4 rounded opacity-50 cursor-not-allowed"
                 : "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded cursor-pointer"

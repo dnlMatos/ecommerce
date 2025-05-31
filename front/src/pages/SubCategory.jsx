@@ -62,7 +62,7 @@ const SubCategory = () => {
         return (
           <>
             {row.original.category.map((c, index) => {
-              return <> {c.name}</>;
+              return <p key={index}> {c.name}</p>;
             })}
           </>
         );
