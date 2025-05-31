@@ -73,7 +73,7 @@ export const SummaryApi = {
     method: "GET",
   },
 
-  uploadCategory: {
+  updateCategory: {
     url: `/api/category/update`,
     method: "PUT",
   },

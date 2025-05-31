@@ -61,11 +61,12 @@ export const updateSubCategoryController = async (req, res) => {
   try {
     const { _id, name, image, category } = req.body;
 
-    const checkSub = await SubCategoryModel.findId(_id);
+    const checkSub = await SubCategoryModel.findById(_id);
+    console.log(req.body);
 
     if (!checkSub) {
       return res.status(400).json({
-        message: "Verifiquei seu id",
+        message: "Verifique seu id",
         error: true,
         success: false,
       });
@@ -78,7 +79,7 @@ export const updateSubCategoryController = async (req, res) => {
     });
 
     return res.json({
-      message: "Atualizado com sucesso",
+      message: "Subcategoria atualizada com sucesso",
       data: updateSubCategory,
       error: false,
       success: true,
@@ -98,7 +99,7 @@ export const deleteSubCategoryController = async (req, res) => {
     const deleteSub = await SubCategoryModel.findByIdAndDelete(_id);
 
     return res.json({
-      message: "Deletado com sucesso",
+      message: "Subcategoria deletada com sucesso",
       data: deleteSub,
       error: false,
       success: true,
