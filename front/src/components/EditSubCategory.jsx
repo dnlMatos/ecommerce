@@ -9,7 +9,7 @@ import { IoClose } from "react-icons/io5";
 
 const EditSubCategory = ({ close, data, fetchData }) => {
   const [subCategoryData, setSubCategoryData] = useState({
-    _id: data.id,
+    _id: data._id,
     name: data.name,
     image: data.image,
     category: data.category || [],
@@ -60,13 +60,10 @@ const EditSubCategory = ({ close, data, fetchData }) => {
     e.preventDefault();
 
     try {
-      const response = await Axios(
-        {
-          ...SummaryApi.updateSubCategory,
-          data: subCategoryData,
-        },
-        console.log(subCategoryData)
-      );
+      const response = await Axios({
+        ...SummaryApi.updateSubCategory,
+        data: subCategoryData,
+      });
 
       const { data: responseData } = response;
 
