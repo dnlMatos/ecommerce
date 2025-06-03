@@ -102,4 +102,9 @@ export const SummaryApi = {
     url: `/api/subcategory/delete`,
     method: "DELETE",
   },
+
+  createProduct: {
+    url: `/api/product/create`,
+    method: "POST",
+  },
 };
