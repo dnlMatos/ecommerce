@@ -27,9 +27,9 @@ const UploadProduct = () => {
   });
   const [imageLoading, setImageLoading] = useState(false);
   const [viewImageURL, setViewImageUrl] = useState("");
-  const allCategory = useSelector((state) => state.product.allCategory);
   const [selectSubCategory, setSelectSubCategory] = useState("");
   const [selectCategory, setSelectCategory] = useState("");
+  const allCategory = useSelector((state) => state.product.allCategory);
   const allSubCategory = useSelector((state) => state.product.allSubCategory);
   const [openAddField, setOpenAddField] = useState(false);
   const [fieldName, setFieldName] = useState("");
@@ -132,9 +132,6 @@ const UploadProduct = () => {
     }
   };
 
-  console.log(allCategory);
-  console.log(allSubCategory);
-
   return (
     <section>
       <div className="bg-white shadow-md flex items-center justify-between">
@@ -187,10 +184,10 @@ const UploadProduct = () => {
                   {imageLoading ? (
                     <Loading />
                   ) : (
-                    <>
+                    <div className="gap-2 cursor-pointer flex justify-center flex-column items-center">
                       <FaCloudUploadAlt size={35} />
                       <p>Carregar foto</p>
-                    </>
+                    </div>
                   )}
                 </div>
                 <input
@@ -205,7 +202,10 @@ const UploadProduct = () => {
               <div className="flex flex-wrap gap-4">
                 {data.image.map((img, index) => {
                   return (
-                    <div className="h-20 mt-1 w-20 min-w-20 bg-blue-50 border relative group">
+                    <div
+                      className="h-20 mt-1 w-20 min-w-20 bg-blue-50 border relative group"
+                      key={index}
+                    >
                       <img
                         src={img}
                         alt={img}
@@ -213,7 +213,7 @@ const UploadProduct = () => {
                         onClick={() => setViewImageUrl(img)}
                       />
                       <div
-                        className="absolute bottom-0 right-0 p-1 bg-red-600 hover:bg-red-600 rounded text-white hidden group-hover-pointer"
+                        className="absolute bottom-0 right-0 p-1 m-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded text-white group-hover-pointer"
                         onClick={() => handleDeleteImage(index)}
                       >
                         <MdDelete />
@@ -372,7 +372,7 @@ const UploadProduct = () => {
             <input
               id="price"
               type="number"
-              placeholder="Digite o valor de cada produto"
+              placeholder="Informe a quantidade em estoque"
               name="price"
               value={data.price}
               onChange={handleChange}
