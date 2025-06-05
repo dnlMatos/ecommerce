@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import uploadImage from "../utils/uploadImage";
 import toast from "react-hot-toast";
@@ -12,13 +12,14 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 
-const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
+const UploadSubCategoryModel = ({ fetchData, closeModal, data }) => {
   const [open, setOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [subCategoryData, setSubCategoryData] = useState({
-    name: "",
-    image: "",
-    category: [],
+    _id: data?._id || "",
+    name: data?.name || "",
+    image: data?.image || "",
+    category: data?.category || [],
   });
 
   const allCategory = useSelector((state) => state.product.allCategory);
@@ -78,10 +79,13 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await Axios({
-        ...SummaryApi.createSubCategory,
-        data: subCategoryData,
-      });
+      const response = await Axios(
+        {
+          ...SummaryApi.createSubCategory,
+          data: subCategoryData,
+        },
+        console.log(data)
+      );
       const { data: responseData } = response;
 
       if (responseData.success) {
@@ -96,6 +100,17 @@ const UploadSubCategoryModel = ({ fetchData, closeModal }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      setSubCategoryData({
+        _id: data._id || "",
+        name: data.name || "",
+        image: data.image || "",
+        category: data.category || [],
+      });
+    }
+  }, [data]);
 
   return (
     <section className="top-0 left-0 right-0 p-4 bg-neutral-800 bg-opacity-60 flex items-center">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import UploadSubCategoryModel from "../components/UploadSubCategoryModel";
 import Axios from "../utils/Axios";
 import { SummaryApi } from "../common/SummaryApi";
@@ -9,17 +9,21 @@ import ViewImage from "../components/ViewImage";
 import { MdDelete } from "react-icons/md";
 import { HiPencil } from "react-icons/hi";
 import EditSubCategory from "../components/EditSubCategory";
+import { ConfirmBox } from "../components/ConfirmBox";
+import toast from "react-hot-toast";
 
 const SubCategory = () => {
   const [openAddSubCategory, setOpenAddSubCategory] = useState(false);
-  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const columnHelper = createColumnHelper();
   const [ImageURL, setImageURL] = useState("");
   const [openEdit, setOpenEdit] = useState(false);
+  const [data, setData] = useState([]);
   const [editData, setEditData] = useState({ _id: "" });
+  const [deleteSubCategory, setDeleteSubCategory] = useState({ _id: "" });
+  const [openDeleteConfirmBox, setOpenDeleteConfirmBox] = useState(false);
 
-  const fetchSubCategory = async () => {
+  const fetchSubCategory = useCallback(async () => {
     setLoading(true);
     try {
       const response = await Axios({
@@ -35,7 +39,7 @@ const SubCategory = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const column = [
     columnHelper.accessor("name", { header: "Nome" }),
@@ -97,9 +101,28 @@ const SubCategory = () => {
     }),
   ];
 
+  const handleDeleteSubCategory = async () => {
+    try {
+      const response = await Axios({
+        ...SummaryApi.deleteSubCategory,
+        data: deleteSubCategory,
+      });
+
+      const { data: responseData } = response;
+      if (responseData.success) {
+        toast.success(responseData.message);
+        fetchSubCategory();
+        setOpenDeleteConfirmBox(false);
+        setDeleteSubCategory({ _id: "" });
+      }
+    } catch (error) {
+      AxiosToastError(error);
+    }
+  };
+
   useEffect(() => {
     fetchSubCategory();
-  }, []);
+  }, [fetchSubCategory]);
 
   return (
     <section className="category-page">
@@ -113,13 +136,14 @@ const SubCategory = () => {
         </button>
       </div>
 
-      <div>
+      <div className="overflow-auto w-full max-w-[95vw]">
         <DisplayTable data={data} column={column} />
       </div>
 
       {openAddSubCategory && (
         <UploadSubCategoryModel
           fetchData={fetchSubCategory}
+          data={editData}
           closeModal={() => setOpenAddSubCategory(false)}
         />
       )}
@@ -130,6 +154,16 @@ const SubCategory = () => {
           fetchData={fetchSubCategory}
           data={editData}
           close={() => setOpenEdit(false)}
+        />
+      )}
+
+      {openDeleteConfirmBox && (
+        <ConfirmBox
+          cancel={() => setOpenDeleteConfirmBox(false)}
+          close={() => setOpenDeleteConfirmBox(false)}
+          confirm={handleDeleteSubCategory}
+          fetchData={fetchSubCategory}
+          data={editData}
         />
       )}
     </section>

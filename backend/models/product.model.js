@@ -5,18 +5,24 @@ const productSchema = new mongoose.Schema(
     name: {
       type: String,
     },
-    image: {
-      type: String,
-      default: [],
-    },
-    category: {
-      type: mongoose.Schema.ObjectId,
-      ref: "category",
-    },
-    subCategory: {
-      type: mongoose.Schema.ObjectId,
-      ref: "subCategory",
-    },
+    image: [
+      {
+        type: String,
+        default: [],
+      },
+    ],
+    category: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "category",
+      },
+    ],
+    subCategory: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "subCategory",
+      },
+    ],
     unit: {
       type: String,
       default: "",
@@ -33,10 +39,12 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
-    more_details: {
-      type: String,
-      default: {},
-    },
+    more_details: [
+      {
+        type: Object,
+        default: {},
+      },
+    ],
     publish: {
       type: Boolean,
       default: true,
@@ -44,6 +52,17 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+  }
+);
+
+productSchema.index(
+  {
+    name: "text",
+    description: "text",
+  },
+  {
+    name: 10,
+    description: 5,
   }
 );
 

@@ -43,7 +43,7 @@ export const getSubCategoryController = async (req, res) => {
       .populate("category");
 
     return res.json({
-      message: "Dados da categoria",
+      message: "Dados da subcategoria",
       error: false,
       success: true,
       data: data,

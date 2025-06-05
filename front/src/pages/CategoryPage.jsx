@@ -8,23 +8,21 @@ import { EditCategory } from "../components/EditCategory";
 import { ConfirmBox } from "../components/ConfirmBox";
 import NoData from "../components/NoData";
 import FadeLoader from "react-spinners/FadeLoader";
-import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const CategoryPage = () => {
-  const [loadingData, setLoadingData] = useState(false);
-
   const [openUploadCategory, setOpenUploadCategory] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [categoryData, setCategoryData] = useState([]);
   const [openEdit, setOpenEdit] = useState(false);
-  const [openConfirmBoxDelete, setOpenConfirmBoxDelete] = useState(false);
-  const [deleteCategory, setDeleteCategory] = useState({ _id: "" });
   const [editData, setEditData] = useState({
     name: "",
     image: "",
   });
 
-  const allCategory = useSelector((state) => state.product.allCategory);
+  const [openConfirmBoxDelete, setOpenConfirmBoxDelete] = useState(false);
+  const [deleteCategory, setDeleteCategory] = useState({ _id: "" });
 
   const fetchCategory = async () => {
     try {
@@ -54,6 +52,7 @@ const CategoryPage = () => {
       const { data: responseData } = response;
 
       if (responseData.success) {
+        toast.success(responseData.message);
         fetchCategory();
         setOpenConfirmBoxDelete(false);
       }
@@ -63,8 +62,8 @@ const CategoryPage = () => {
   };
 
   useEffect(() => {
-    setCategoryData(allCategory);
-  }, [allCategory]);
+    fetchCategory();
+  }, []);
 
   return (
     <section className="">

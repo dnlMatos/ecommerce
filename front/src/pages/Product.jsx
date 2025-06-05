@@ -1,24 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { SummaryApi } from "../common/SummaryApi";
+import React, { useEffect, useState, useCallback } from "react";
 import Axios from "../utils/Axios";
+import { SummaryApi } from "../common/SummaryApi";
 import AxiosToastError from "../utils/AxiosToastError";
 
-const ProductAdmin = () => {
+export const Product = () => {
   const [productData, setProductData] = useState([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [totalPageCount, setPageCount] = useState(1);
-  const [search, setSearch] = useState("");
 
   const fetchProductData = useCallback(async () => {
     try {
-      setLoading(true);
       const response = await Axios({
         ...SummaryApi.getProduct,
         data: {
           page: page,
-          limit: 12,
-          search: search,
         },
       });
 
@@ -27,8 +21,6 @@ const ProductAdmin = () => {
       if (responseData.success) setProductData.data;
     } catch (error) {
       AxiosToastError(error);
-    } finally {
-      setLoading(false);
     }
   }, [page]);
 
@@ -37,5 +29,3 @@ const ProductAdmin = () => {
   }, [fetchProductData]);
   return <div>Product</div>;
 };
-
-export default ProductAdmin;
